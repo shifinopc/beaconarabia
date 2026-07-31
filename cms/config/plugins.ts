@@ -39,37 +39,41 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
       },
     },
   },
-  /*
-   * NOT INSTALLED: strapi-google-analytics-dashboard
+  /**
+   * Google Analytics 4 dashboard in the admin (Settings -> Google Analytics).
    *
-   * Installed and tested twice, removed both times. Three independent failures
-   * at v0.0.2 — which is the newest release; only 0.0.1 and 0.0.2 have ever
-   * shipped:
+   * `chart.js` and `react-chartjs-2` are declared as direct dependencies of
+   * this app even though nothing here imports them. The plugin registers its
+   * Chart.js scales against whichever copy it resolves, and if npm nests a
+   * second copy the chart renders against a different registry — which
+   * surfaces as `"category" is not a registered scale` the moment the
+   * dashboard loads. Hoisting them guarantees one instance. Do not remove them
+   * as "unused".
    *
-   * 1. It publishes its own credentials. All three routes declare
-   *    `auth: false`, so the settings endpoint holding the Google Cloud
-   *    service-account key is world-readable and world-writable. Verified with
-   *    no credentials of any kind:
+   * SECURITY, known and accepted: at v0.0.2 all three of the plugin's routes
+   * declare `auth: false`, verified in the published package. The settings
+   * endpoint that stores the Google Cloud service-account key is therefore
+   * readable and writable by anyone who can reach the CMS:
    *
-   *      PUT /api/strapi-google-analytics-dashboard/settings -> 200
-   *      GET /api/strapi-google-analytics-dashboard/settings -> key returned
+   *   PUT /api/strapi-google-analytics-dashboard/settings -> 200
+   *   GET /api/strapi-google-analytics-dashboard/settings -> key returned
    *
-   *    Not fixable from here: its admin UI calls those routes with a plain
-   *    fetch() and no Authorization header, so requiring auth breaks the panel.
+   * It cannot be fixed here — the plugin's own admin UI calls those routes
+   * with a plain fetch() and no Authorization header, so adding auth would
+   * break the panel.
    *
-   * 2. It takes this deployment down. `@google-analytics/data` pulls in
-   *    gRPC/protobuf, whose native threads pushed the CMS past the shared
-   *    host's LVE limit — Strapi could no longer fork and every request 503'd.
+   * Therefore the service account entered in that screen must be scoped to
+   * survive disclosure: a NEW account, with NO project-level IAM roles, added
+   * only as a Viewer on the single GA4 property. So scoped, a leaked key is
+   * read-only access to one property's analytics. Cloudflare Access in front
+   * of /admin and this plugin's routes closes it properly.
    *
-   * 3. Its dashboard does not work. It bundles chart.js@4 but never calls
-   *    ChartJS.register(), so the page dies on load with `"category" is not a
-   *    registered scale`. Chart.js v3+ requires explicit registration; this is
-   *    broken for everyone, not just here.
-   *
-   * Nothing is lost. Collection is the gtag snippet in the frontend
-   * (components/Analytics.tsx) — that is what records visits. This plugin only
-   * displayed data back, which analytics.google.com does properly.
+   * Note this plugin only *displays* analytics. Collection is the gtag snippet
+   * in the frontend (components/Analytics.tsx), which is independent of it.
    */
+  'strapi-google-analytics-dashboard': {
+    enabled: true,
+  },
 });
 
 export default config;
