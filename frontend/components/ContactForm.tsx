@@ -1,15 +1,10 @@
 "use client";
 
-import emailjs from "@emailjs/browser";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import styles from "@/styles/contact.module.css";
 import type { Region } from "@/lib/regions";
-
-const EMAILJS = {
-  serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? "",
-  templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? "",
-  publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? "",
-};
+import TurnstileWidget from "./TurnstileWidget";
+import { submitForm, HONEYPOT_FIELD, honeypotStyle } from "@/lib/submit-form";
 
 const EMPTY = { name: "", email: "", phone: "", subject: "", message: "" };
 
@@ -23,10 +18,14 @@ type Status = "idle" | "sending" | "sent" | "error";
  * form did rather than as unstyled markup.
  *
  * Changes from the legacy version:
- *  - EmailJS ids come from env vars rather than a committed emailjs.config.js
  *  - the payload carries the region, so enquiries from /ae and /sa are
  *    distinguishable in the inbox (the old sites each hardcoded their own
  *    `website` value to achieve this, which no longer works from one codebase)
+ *  - submits to /api/contact instead of calling EmailJS from the browser. The
+ *    legacy approach shipped the service id, template id and public key in the
+ *    bundle, so anyone could read them out and send through the account's
+ *    quota. Sending server-side keeps them out of the client and puts a
+ *    honeypot, rate limit and Turnstile check in front of every send.
  */
 export default function ContactForm({
   region,
@@ -42,8 +41,13 @@ export default function ContactForm({
   const [formData, setFormData] = useState(EMPTY);
   const [status, setStatus] = useState<Status>("idle");
   const [isHovered, setIsHovered] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const isConfigured = Boolean(EMAILJS.serviceId && EMAILJS.templateId && EMAILJS.publicKey);
+  // Stable identity: TurnstileWidget re-renders its challenge when this
+  // changes, and an inline arrow would do that on every keystroke.
+  const handleToken = useCallback((token: string) => setTurnstileToken(token), []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -54,23 +58,24 @@ export default function ContactForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isConfigured) {
-      setStatus("error");
-      return;
-    }
-
     setStatus("sending");
-    try {
-      await emailjs.send(
-        EMAILJS.serviceId,
-        EMAILJS.templateId,
-        { ...formData, region: region.label, ...(enquiryType ? { enquiryType } : {}) },
-        { publicKey: EMAILJS.publicKey },
-      );
+    setErrorMessage("");
+
+    const result = await submitForm({
+      kind: "contact",
+      ...formData,
+      region: region.label,
+      ...(enquiryType ? { enquiryType } : {}),
+      [HONEYPOT_FIELD]: honeypot,
+      turnstileToken,
+    });
+
+    if (result.ok) {
       setStatus("sent");
       setFormData(EMPTY);
-    } catch {
+    } else {
       setStatus("error");
+      setErrorMessage(result.error ?? "");
     }
   };
 
@@ -135,7 +140,25 @@ export default function ContactForm({
           placeholder="Type your message here..."
         />
       </div>
+      {/* Honeypot: off-screen rather than display:none, so bots that skip
+          hidden inputs still fill it. aria-hidden + tabIndex keep it away from
+          screen readers and keyboard users. */}
+      <div style={honeypotStyle} aria-hidden="true">
+        <label htmlFor="website">Do not fill this in</label>
+        <input
+          type="text"
+          id="website"
+          name={HONEYPOT_FIELD}
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       <div className={styles.formSubmit} />
+
+      <TurnstileWidget onToken={handleToken} />
 
       <div className="ml-auto">
         <button
@@ -171,9 +194,7 @@ export default function ContactForm({
       {status === "sent" && <p role="status">Thanks — we&apos;ll be in touch shortly.</p>}
       {status === "error" && (
         <p role="alert">
-          {isConfigured
-            ? "Something went wrong. Please try again or email us directly."
-            : "Contact form is not configured yet (missing EmailJS environment variables)."}
+          {errorMessage || "Something went wrong. Please try again or email us directly."}
         </p>
       )}
     </form>

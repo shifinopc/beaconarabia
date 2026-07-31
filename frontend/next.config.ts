@@ -20,9 +20,51 @@ import type { NextConfig } from "next";
  */
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Baseline security headers, applied to every response.
+ *
+ * A strict Content-Security-Policy is deliberately not included. Getting one
+ * right here means allowlisting EmailJS, the Strapi media host and the inline
+ * styles the ported legacy stylesheet relies on; a policy written without
+ * verifying each of those tends to either break the site or be so permissive it
+ * provides nothing. The headers below are unambiguous wins that need no
+ * per-origin research.
+ */
+const securityHeaders = [
+  // Two years, matching the preload-list requirement. Safe here because both
+  // beaconarabia.com and cms.beaconarabia.com are HTTPS-only behind Cloudflare
+  // — if any subdomain ever needs plain HTTP, drop includeSubDomains first.
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
+  // Stops browsers second-guessing Content-Type, which is how an uploaded file
+  // ends up executed as script.
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  // Clickjacking: nothing here is meant to be framed by another site.
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  // Send the full URL to ourselves, origin-only cross-site, nothing when
+  // downgrading to HTTP.
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "X-DNS-Prefetch-Control", value: "on" },
+  // The site asks for none of these; denying them means an injected script
+  // can't either.
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+  },
+];
+
 const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
+  },
+  // Drops the `X-Powered-By: Next.js` header — a free version fingerprint that
+  // tells an attacker which framework CVEs to try.
+  poweredByHeader: false,
+
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
   },
   images: {
     // The legacy components all pass quality={100}; Next 16 requires each

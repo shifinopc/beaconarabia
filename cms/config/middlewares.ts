@@ -17,11 +17,57 @@ import type { Core } from '@strapi/strapi';
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Middlewares => [
   'strapi::logger',
   'strapi::errors',
-  'strapi::security',
+  {
+    name: 'strapi::security',
+    config: {
+      /**
+       * Strapi's default CSP restricts `img-src`/`media-src` to 'self' plus a
+       * few provider hosts. That is correct for the API but breaks the admin
+       * panel's own previews once media is served from a different origin than
+       * the admin is loaded from — which is the case in production, where the
+       * panel runs on cms.beaconarabia.com behind Cloudflare.
+       *
+       * `https:` rather than a named host: the media origin is env-driven
+       * (PUBLIC_URL) and changes between local, staging and production, so
+       * pinning a hostname here would silently break previews on whichever
+       * environment wasn't the one it was written for. Restricting to HTTPS
+       * still rules out plaintext and data-exfiltration over other schemes,
+       * and this policy governs the admin panel — not the public site, which
+       * sets its own headers in frontend/next.config.ts.
+       */
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          'connect-src': ["'self'", 'https:'],
+          'img-src': ["'self'", 'data:', 'blob:', 'https:'],
+          'media-src': ["'self'", 'data:', 'blob:', 'https:'],
+          // Left null deliberately: with Cloudflare terminating TLS, emitting
+          // upgrade-insecure-requests can cause redirect loops on hosts that
+          // talk plain HTTP to the origin.
+          upgradeInsecureRequests: null,
+        },
+      },
+    },
+  },
   {
     name: 'strapi::cors',
     config: {
       origin: env.array('CORS_ORIGINS', ['http://localhost:3000', 'http://localhost:1337']),
+    },
+  },
+  /**
+   * Placed before the body parser so a flood is rejected without Strapi
+   * spending work parsing it. Counts anonymous /api traffic and, far more
+   * strictly, attempts against the admin login — see src/middlewares/
+   * rate-limit.ts for why authenticated requests are exempt.
+   */
+  {
+    name: 'global::rate-limit',
+    config: {
+      max: env.int('RATE_LIMIT_MAX', 120),
+      windowMs: env.int('RATE_LIMIT_WINDOW_MS', 60_000),
+      authMax: env.int('RATE_LIMIT_AUTH_MAX', 10),
+      authWindowMs: env.int('RATE_LIMIT_AUTH_WINDOW_MS', 300_000),
     },
   },
   'strapi::poweredBy',

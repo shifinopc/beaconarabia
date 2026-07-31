@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...except the template, which holds no secrets and is the only record of
+# which variables the app needs. Without this exception a fresh clone gives no
+# hint that EMAILJS_PRIVATE_KEY or STRAPI_API_TOKEN are required at all.
+!.env.example
 
 # vercel
 .vercel

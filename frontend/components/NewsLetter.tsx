@@ -1,16 +1,10 @@
 "use client";
 
-import emailjs from "@emailjs/browser";
 import Image from "next/image";
 import { useState } from "react";
 import styles from "@/styles/newsletter.module.css";
 import type { Region } from "@/lib/regions";
-
-const EMAILJS = {
-  serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? "",
-  templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? "",
-  publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? "",
-};
+import { submitForm, HONEYPOT_FIELD, honeypotStyle } from "@/lib/submit-form";
 
 /**
  * Newsletter signup — the block at the top of the footer.
@@ -21,31 +15,38 @@ const EMAILJS = {
  *
  * Changes from the original: the EmailJS service/template/public keys were
  * hardcoded string literals in the component and the payload was logged to the
- * console on every submit — keys now come from env vars, logging removed.
+ * console on every submit — logging removed, and the send now goes through
+ * /api/contact so no key reaches the browser at all (see ContactForm).
+ *
+ * No Turnstile widget here: a challenge above a single email field in the
+ * footer is disproportionate, and the honeypot plus the server-side rate limit
+ * already cover the realistic abuse. The contact and popup forms, which send
+ * far more content, do carry it.
  */
 export default function NewsLetter({ region }: { region: Region }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-
-  const isConfigured = Boolean(EMAILJS.serviceId && EMAILJS.templateId && EMAILJS.publicKey);
+  const [honeypot, setHoneypot] = useState("");
 
   const handleSubmit = async () => {
-    if (!email.trim() || !isConfigured) {
+    if (!email.trim()) {
       setStatus("error");
       return;
     }
 
     setStatus("sending");
-    try {
-      await emailjs.send(
-        EMAILJS.serviceId,
-        EMAILJS.templateId,
-        { email, clickedpopupname: "Newsletter", region: region.label },
-        { publicKey: EMAILJS.publicKey },
-      );
+    const result = await submitForm({
+      kind: "newsletter",
+      email,
+      subject: "Newsletter signup",
+      region: region.label,
+      [HONEYPOT_FIELD]: honeypot,
+    });
+
+    if (result.ok) {
       setStatus("sent");
       setEmail("");
-    } catch {
+    } else {
       setStatus("error");
     }
   };
@@ -69,6 +70,19 @@ export default function NewsLetter({ region }: { region: Region }) {
         </div>
 
         <div>
+          <div style={honeypotStyle} aria-hidden="true">
+            <label htmlFor="newsletter-website">Do not fill this in</label>
+            <input
+              type="text"
+              id="newsletter-website"
+              name={HONEYPOT_FIELD}
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
           <div className={styles.leftContainer}>
             <label htmlFor="newsletter-email" className="sr-only">
               Email address
@@ -105,9 +119,7 @@ export default function NewsLetter({ region }: { region: Region }) {
           )}
           {status === "error" && (
             <div className={styles.statusMessage} style={{ color: "#fff" }} role="alert">
-              {isConfigured
-                ? "Failed to subscribe. Please try again."
-                : "Newsletter is not configured yet."}
+              Failed to subscribe. Please try again.
             </div>
           )}
         </div>

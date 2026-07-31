@@ -1,14 +1,9 @@
 "use client";
 
-import emailjs from "@emailjs/browser";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Region } from "@/lib/regions";
-
-const EMAILJS = {
-  serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? "",
-  templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? "",
-  publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? "",
-};
+import TurnstileWidget from "./TurnstileWidget";
+import { submitForm, HONEYPOT_FIELD, honeypotStyle } from "@/lib/submit-form";
 
 const EMPTY = { name: "", phone: "", email: "", companyname: "" };
 
@@ -53,8 +48,11 @@ export default function Popup({
   const [formData, setFormData] = useState(EMPTY);
   const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
   const [error, setError] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
 
-  const isConfigured = Boolean(EMAILJS.serviceId && EMAILJS.templateId && EMAILJS.publicKey);
+  // Stable so the challenge isn't re-rendered on every keystroke.
+  const handleToken = useCallback((token: string) => setTurnstileToken(token), []);
 
   useEffect(() => {
     // Controlled instances (e.g. the ebook banner) open on demand, not on a timer.
@@ -93,33 +91,35 @@ export default function Popup({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isConfigured) {
+    setStatus("sending");
+    setError("");
+
+    const result = await submitForm({
+      kind: "popup",
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      subject: heading,
+      message: formData.companyname ? `Company: ${formData.companyname}` : "",
+      region: region.label,
+      [HONEYPOT_FIELD]: honeypot,
+      turnstileToken,
+    });
+
+    if (!result.ok) {
       setStatus("error");
-      setError("Enquiry form is not configured yet.");
+      setError(result.error ?? "Something went wrong. Please try again.");
       return;
     }
 
-    setStatus("sending");
-    try {
-      await emailjs.send(
-        EMAILJS.serviceId,
-        EMAILJS.templateId,
-        { ...formData, clickedpopupname: heading, region: region.label },
-        { publicKey: EMAILJS.publicKey },
-      );
-
-      if (variant === "ebook") {
-        const link = document.createElement("a");
-        link.href = "/ebook/ebook.pdf";
-        link.download = "beacon-business-setup-guide.pdf";
-        link.click();
-      }
-
-      close();
-    } catch (err) {
-      setStatus("error");
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    if (variant === "ebook") {
+      const link = document.createElement("a");
+      link.href = "/ebook/ebook.pdf";
+      link.download = "beacon-business-setup-guide.pdf";
+      link.click();
     }
+
+    close();
   };
 
   return (
@@ -185,6 +185,21 @@ export default function Popup({
             value={formData.companyname}
             onChange={handleChange}
           />
+
+          <div style={honeypotStyle} aria-hidden="true">
+            <label htmlFor="popup-website">Do not fill this in</label>
+            <input
+              type="text"
+              id="popup-website"
+              name={HONEYPOT_FIELD}
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
+          <TurnstileWidget onToken={handleToken} />
 
           <button
             type="submit"
