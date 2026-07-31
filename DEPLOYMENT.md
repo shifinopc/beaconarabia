@@ -12,42 +12,89 @@ an entry point for that, not something used in development.
 
 ---
 
-## The two rules that matter
+## The three rules that matter
 
-**1. Never run `npm run build` for the CMS on the server.** Strapi builds its
-admin panel with Vite, which shells out to esbuild, and esbuild segfaults under
-CloudLinux's CageFS (`SIGSEGV` from `esbuild --version` during install). Build
-the CMS locally and upload `dist/` instead — see below. The frontend is
-unaffected: Next compiles with SWC and bundles with Turbopack, both Rust, so it
-builds fine on the server.
+**1. Neither app can be built on the server. Build locally, upload the output.**
 
-**2. The frontend needs `--webpack` and a worker cap.** Turbopack refuses
-cPanel's symlinked `node_modules` ("it points out of the filesystem root"), and
-Next otherwise sees 32 CPUs and spawns 26 workers, blowing past the account's
-100-process limit with `spawn EAGAIN`.
+- The **CMS** dies because Strapi builds its admin panel with Vite, which shells
+  out to esbuild, and esbuild segfaults under CloudLinux's CageFS (`SIGSEGV`
+  from `esbuild --version`).
+- The **frontend** dies because CloudLinux's LVE layer refuses to fork:
+  `spawn ... EAGAIN`, or `OS can't spawn worker thread` from inside Rust. This
+  is *not* a process-count problem — it happens with 5 processes running and
+  `ulimit -u unlimited`, and it happens even after forcing a single worker
+  (`experimental.cpus: 1`, which the config supports via `NEXT_BUILD_CPUS`).
+  The binding constraint is the LVE memory cap; a webpack build wants more than
+  the plan allows. Check cPanel → Resource Usage for `MEM`/`NPROC` faults at
+  build times, and ask Verpex to raise the limit if you want on-server builds
+  back.
+
+Note that `taskset` does **not** help: it constrains CPU affinity, but
+`os.cpus()` still reports every core, so Next sizes its worker pool the same.
+Only `experimental.cpus` changes the worker count.
+
+**2. `chmod -R u+rwX,go+rX` after EVERY extraction. Non-negotiable.**
+
+Archives extracted on this host arrive with directories missing their execute
+bit, which makes them untraversable. This has caused three separate outages:
+
+- `app/api` and `public/*` → build failed with `EACCES: scandir`
+- all fourteen `dist/src/api` directories → Strapi registered **zero** content
+  routes, so `/api/*` 404'd while `/admin` returned 200 and the app looked
+  healthy
+- `.next/static/*` → every request 503'd
+
+The capital `X` matters: it sets the execute bit on directories only, leaving
+files at `644`. Do not try to fix it with `find -exec chmod` — `find` cannot
+descend into the broken directories in the first place.
+
+**3. Never delete a working build before the replacement is proven.**
+
+`rm -rf .next` followed by a build that fails leaves no way to serve the site.
+Swap only on success:
+
+```bash
+mv .next .next.old && <build command> && rm -rf .next.old || (rm -rf .next && mv .next.old .next)
+```
 
 ---
 
 ## Deploying a frontend change
 
+Build **locally**, against the live CMS, so the prerendered pages contain real
+content and the inlined `NEXT_PUBLIC_*` values are the production ones:
+
 ```bash
-source /home/beaconarabia/nodevenv/frontend/24/bin/activate
-cd /home/beaconarabia/frontend
+cd beacon-platform/frontend
 rm -rf .next
-CIRCLE_NODE_TOTAL=3 taskset -c 0,1 npx next build --webpack
-touch tmp/restart.txt
+NEXT_PUBLIC_SITE_URL="https://beaconarabia.com" \
+STRAPI_URL="https://cms.beaconarabia.com" \
+STRAPI_API_TOKEN="<the live read-only token>" \
+NODE_ENV=production npx next build --webpack
 ```
 
-Confirm the build actually finished — `BUILD_ID` alone is not enough, it is
-written before static generation:
+`NEXT_PUBLIC_SITE_URL` is baked in at build time, so building with the local
+value publishes localhost canonicals, hreflang and sitemap entries. Before
+shipping, confirm nothing sensitive was captured:
 
 ```bash
-ls .next/prerender-manifest.json && echo "BUILD OK"
+grep -rl "$STRAPI_API_TOKEN" .next | wc -l   # must be 0
+grep -rl "localhost" .next/static | wc -l    # 1 is fine (URL polyfill), more is not
 ```
 
-A missing `prerender-manifest.json` means the build died partway and **every
-request will 500**, while LiteSpeed serves a default page that looks like a
-stale site rather than an error.
+Zip `.next`, upload, extract into `/home/beaconarabia/frontend/`, then:
+
+```bash
+cd ~/frontend
+chmod -R u+rwX,go+rX .next          # REQUIRED — see rule 2
+find .next -type d ! -perm -u+x | wc -l   # must print 0
+ls .next/prerender-manifest.json && touch tmp/restart.txt
+```
+
+`prerender-manifest.json` is the real completion marker. `BUILD_ID` is written
+*before* static generation, so its presence means nothing — a build that died
+midway leaves `BUILD_ID` behind and every request 503s or 500s while LiteSpeed
+serves a default page that looks like a stale site rather than an error.
 
 ## Deploying a CMS change
 
@@ -62,7 +109,17 @@ Upload `dist/` to `/home/beaconarabia/cms.beaconarabia.com/`, replacing the
 existing one, then:
 
 ```bash
-touch ~/cms.beaconarabia.com/tmp/restart.txt
+cd ~/cms.beaconarabia.com
+chmod -R u+rwX,go+rX dist           # REQUIRED — see rule 2
+touch tmp/restart.txt
+```
+
+Verify the API is actually serving, not just the admin panel — a permissions
+problem shows up as `/admin` working while every content route 404s:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" -H "Authorization: Bearer <token>" \
+  https://cms.beaconarabia.com/api/services     # expect 200
 ```
 
 ---
@@ -126,6 +183,18 @@ reference those filenames, so both must be restored together.
 - Rate limiting and `clientIp()` both prefer `CF-Connecting-IP`, which the edge
   sets itself; that only works while the domain is proxied (orange cloud).
 
+**Geo-routing cannot be tested by sending your own `CF-IPCountry` header** —
+Cloudflare overwrites it with the real value, which is the point of it. To check
+the proxy is running at all, use the override path, which does not depend on
+geography:
+
+```bash
+curl -sI "https://beaconarabia.com/?region=global"   # expect 307 + Set-Cookie
+```
+
+`https://beaconarabia.com/cdn-cgi/trace` reports the country Cloudflare has
+assigned you (`loc=`), which is what the proxy will actually see.
+
 ---
 
 ## Things that have gone wrong before
@@ -133,8 +202,16 @@ reference those filenames, so both must be restored together.
 | Symptom | Cause |
 | --- | --- |
 | Old site served despite new code deployed | Cloudflare DNS still pointing at the previous host |
-| Every route 500s, `stderr.log` empty | Incomplete build — check `prerender-manifest.json` |
-| `/api/*` 404s while `/admin` works | `dist/src/api` directories missing the execute bit; `chmod 755` recursively |
+| Every route 503s, `EACCES: scandir` in `stderr.log` | Extracted directories missing the execute bit — `chmod -R u+rwX,go+rX` |
+| Every route 500s, `stderr.log` empty | Incomplete build — check `prerender-manifest.json`, not `BUILD_ID` |
+| `/api/*` 404s while `/admin` returns 200 | Same execute-bit problem on `dist/src/api`; Strapi silently registers zero routes |
+| `spawn ... EAGAIN` / `OS can't spawn worker thread` during build | CloudLinux LVE limit (memory, not process count). Build locally instead |
 | CMS won't boot, `libvips` error | `sharp` installed without its Linux binary — `npm install --include=optional sharp` |
 | Content types all empty after import | Partial SQL import (see above) |
 | `Invalid URL … input: ''` at boot | An env var is present but empty; `??` does not catch empty strings |
+| Site serves localhost canonicals | Built with the local `NEXT_PUBLIC_SITE_URL` — it is inlined at build time |
+| Forms return 503 | `EMAILJS_*` not set; note the names are unprefixed and `EMAILJS_PRIVATE_KEY` is required |
+
+Two of these — the execute-bit problem and the incomplete build — are dangerous
+specifically because the site *looks* like it is merely stale rather than
+broken. Check `stderr.log` before assuming a caching issue.

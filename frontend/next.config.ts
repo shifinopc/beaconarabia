@@ -59,6 +59,27 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
   },
+
+  /**
+   * Build parallelism.
+   *
+   * Next sizes its static-generation worker pool from `os.cpus().length`. On
+   * the shared host that reports 32, so it spawns ~26 workers and dies part-way
+   * through page generation with `OS can't spawn worker thread: Resource
+   * temporarily unavailable` — the account's process/thread limit, not memory.
+   *
+   * `taskset` does not help: it constrains CPU affinity, but `os.cpus()` still
+   * reports every core, so the pool is sized the same. This is the only lever
+   * that actually changes the worker count.
+   *
+   * Driven by env so local builds keep full parallelism (a few seconds) while
+   * the constrained host can ask for one worker: NEXT_BUILD_CPUS=1.
+   */
+  experimental: {
+    ...(process.env.NEXT_BUILD_CPUS
+      ? { cpus: Math.max(1, parseInt(process.env.NEXT_BUILD_CPUS, 10) || 1) }
+      : {}),
+  },
   // Drops the `X-Powered-By: Next.js` header — a free version fingerprint that
   // tells an attacker which framework CVEs to try.
   poweredByHeader: false,
