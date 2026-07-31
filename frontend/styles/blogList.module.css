@@ -1,0 +1,336 @@
+.blogsMainInnerPage {
+  margin: 7.2751322751322745vw 0;
+}
+
+.top110Margin {
+  margin: 7.2751322751322745vw 0;
+}
+
+.bgContainer {
+  background: #021801;
+  height: 33.06878306878307vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9.920634920634921vw;
+}
+
+.topInnerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 9.25925925925926vw;
+}
+
+.leftContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  color: #fff;
+}
+
+.dateContainer {
+  background: rgba(255, 255, 255, 0.1);
+  margin-bottom: 1.3227513227513228vw;
+  color: #fff;
+  padding: 0.5291005291005291vw 0.992063492063492vw;
+  font-size: 1.0582010582010581vw;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot {
+  width: 0.3306878306878307vw;
+  height: 0.3306878306878307vw;
+  border-radius: 0.3306878306878307vw;
+  margin: 0 0.4629629629629629vw;
+  background-color: #fff;
+}
+
+.titleContainer {
+  font-size: 2.380952380952381vw;
+  width: 36.44179894179894vw;
+  /* The article title was a <div> and is now the page's <h1>. Pinning the
+     weight keeps it rendering exactly as before rather than picking up the
+     browser's bold default. */
+  font-weight: 400;
+}
+
+.socialContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  margin-top: 1.3227513227513228vw;
+  gap: 1.0582010582010581vw;
+  display: none;
+}
+
+.share {
+  font-size: 1.0582010582010581vw;
+}
+
+.rightContainer {
+  width: 34.523809523809526vw;
+  height: 22.486772486772484vw;
+}
+
+.rightContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.subHeading {
+  margin-bottom: 1.3227513227513228vw;
+}
+
+.description {
+  margin-bottom: 1.984126984126984vw;
+}
+
+.cardContainer .imageContainer {
+  margin-bottom: 1.984126984126984vw;
+  width: 36.507936507936506vw;
+  height: 23.809523809523807vw;
+}
+
+.cardContainer .imageContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardContainer .subHeading {
+  font-size: 24px;
+  color: black;
+  font-weight: 500;
+}
+
+.container2 {
+  padding: 0 9.920634920634921vw;
+  margin-top: 5.291005291005291vw;
+
+  display: flex;
+  gap: 9.25925925925926vw;
+  position: relative;
+  height: max-content;
+}
+
+.container2RightContainer {
+  width: 47.08994708994709vw;
+}
+
+.container2LeftContainer {
+  width: 23.809523809523807vw;
+  background: #f7f7f8;
+  position: sticky;
+  height: max-content;
+  top: 5.291005291005291vw;
+  padding: 1.984126984126984vw 1.984126984126984vw;
+}
+
+.alsoLike {
+  font-size: 1.3227513227513228vw;
+  font-weight: 500;
+  margin-bottom: 1.984126984126984vw;
+}
+
+.allBlogsContainer img {
+  width: 19.841269841269842vw;
+  height: max-content;
+  margin-bottom: 1.0582010582010581vw;
+}
+
+.allBlogsContainerTitle {
+  margin-bottom: 1.984126984126984vw;
+}
+
+.mainHeading {
+  font-size: 2vw;
+  margin-bottom: 1.984126984126984vw;
+  font-weight: 600;
+}
+
+.link {
+  color: #104add;
+  margin-bottom: 0;
+}
+
+.ul {
+  list-style: outside;
+  margin-left: 1.5vw;
+}
+
+.ul .description {
+  margin-bottom: calc(1.984126984126984vw / 2);
+  text-decoration: dotted;
+  text-align: left;
+}
+
+.link:hover {
+  color: rgba(16, 74, 221, 0.4);
+}
+
+@media only screen and (max-width: 767px) {
+  .blogsMainInnerPage {
+    margin: 7.2751322751322745vw 0;
+  }
+
+  .top110Margin {
+    margin: 7.2751322751322745vw 0;
+  }
+
+  .bgContainer {
+    height: 128.53333333333333vw;
+    align-items: flex-start;
+    padding: 13.333333333333334vw 6.4vw;
+    margin-top: 80px;
+  }
+
+  .topInnerContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    gap: 8vw;
+  }
+
+  .dateContainer {
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 3.2vw;
+    color: #fff;
+    padding: 1.6vw 2.1333333333333333vw;
+    font-size: 3.2vw;
+    width: max-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dot {
+    width: 1.3333333333333335vw;
+    height: 1.3333333333333335vw;
+    border-radius: 1.3333333333333335vw;
+    margin: 0 1.866666666666667vw;
+    background-color: #fff;
+  }
+
+  .titleContainer {
+    font-size: 5.333333333333334vw;
+    width: 87.2vw;
+  }
+
+  .socialContainer {
+    margin-top: 4.266666666666667vw;
+    gap: 4.266666666666667vw;
+  }
+
+  .share {
+    font-size: 3.2vw;
+  }
+
+  .socialContainer img {
+    width: 9.6vw;
+    height: 9.6vw;
+  }
+
+  .rightContainer {
+    width: 87.2vw;
+    height: 56.53333333333334vw;
+  }
+
+  .container2 {
+    padding: 13.333333333333334vw 6.4vw;
+    margin-top: 8vw;
+
+    flex-direction: column;
+    gap: 8vw;
+    position: relative;
+    height: max-content;
+  }
+
+  .subHeading {
+    margin-bottom: 3.2vw;
+  }
+
+  .description {
+    margin-bottom: 5.333333333333334vw;
+    font-size: 3.2vw;
+  }
+
+  .ul {
+    margin-left: 6.4vw;
+  }
+
+  .ul li {
+    padding-left: 0;
+  }
+
+  .ul .description {
+    margin-bottom: calc(5.333333333333334vw / 2);
+  }
+
+  .cardContainer .imageContainer {
+    margin-bottom: 8vw;
+    width: 87.2vw;
+    height: 56.53333333333334vw;
+  }
+
+  .cardContainer .imageContainer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cardContainer .subHeading {
+    font-size: 4.266666666666667vw;
+    margin-bottom: 3.2vw;
+  }
+
+  .container2LeftContainer {
+    width: 87.2vw;
+    background: #f7f7f8;
+    position: relative;
+    height: max-content;
+    top: 0;
+    padding: 8vw 5.333333333333334vw;
+    display: flex;
+    flex-direction: column;
+    gap: 5.333333333333334vw;
+  }
+
+  .container2RightContainer {
+    width: 87.2vw;
+  }
+
+  .alsoLike {
+    font-size: 4.266666666666667vw;
+    font-weight: 500;
+    margin-bottom: 0;
+  }
+
+  .allBlogsContainer img {
+    width: 76.53333333333333vw;
+    height: 53.06666666666666vw;
+    margin-bottom: 4.266666666666667vw;
+  }
+
+  .allBlogsContainerTitle {
+    font-size: 3.733333333333334vw;
+    margin-bottom: 0;
+  }
+
+  .mainHeading {
+    font-size: 4.8vw;
+    margin-bottom: 3.2vw;
+    font-weight: 600;
+  }
+}

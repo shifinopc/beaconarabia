@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "homepages",
+  "info": {
+    "singularName": "homepage",
+    "pluralName": "homepages",
+    "displayName": "Homepage",
+    "description": "Hero content for one region's homepage. One entry per region."
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "region": {
+      "type": "enumeration",
+      "enum": ["global", "ae", "sa"],
+      "required": true,
+      "default": "global"
+    },
+    "heroTitle": { "type": "string", "required": true },
+    "heroDescription": { "type": "text" },
+    "heroCtaLabel": { "type": "string", "default": "Contact Us" },
+    "heroCtaHref": { "type": "string" },
+    "heroImage": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "heroImageMobile": { "type": "media", "multiple": false, "allowedTypes": ["images"] }
+  }
+}

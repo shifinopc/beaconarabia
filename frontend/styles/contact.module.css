@@ -1,0 +1,358 @@
+.contactUsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 118px;
+  gap: 90px;
+}
+
+.contactUsContainer :is(h1, h2, h3, h4, h5, h6) {
+  margin-top: 96px;
+}
+
+.container1 {
+  display: flex;
+  padding: 0 135px;
+  flex-direction: column;
+  /* align-items: center; */
+}
+
+.loctaionButtonContainer {
+  display: flex;
+  gap: 30px;
+  margin-top: -27px;
+  margin-bottom: 70px;
+  align-self: center;
+}
+
+.loctaionButtonContainer .mUae {
+  display: none;
+}
+
+.loctaionButtonContainer button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #02040e;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 120%;
+  /* 19.2px */
+  text-transform: uppercase;
+  border: 1px solid #02040e;
+
+  width: 240px;
+  height: 55px;
+  width: 248px;
+  height: 58px;
+  border-radius: 76px;
+  background: transparent;
+}
+
+/* .loctaionButtonContainer button:hover{
+    background-color: #13670B;
+    color: #FFF;
+} */
+
+.loctaionButtonContainer .btnActive {
+  background-color: #13670b;
+  color: #fff;
+}
+
+.contactMainCard {
+  display: flex;
+  gap: 30px;
+  width: 100%;
+  justify-content: space-between;
+  /*
+   * Flex rows stretch children to the tallest one by default, so a card with
+   * a short 2-line address (Riyadh) was forced to match a 3-line one
+   * (Jeddah/Jazan) — same wasted green space the fixed-height <p> used to
+   * cause, just moved up a level. Each card should only be as tall as its
+   * own content.
+   */
+  align-items: flex-start;
+}
+
+.contactCard {
+  display: flex;
+  flex-direction: column;
+  background-color: #13670b;
+  align-items: center;
+  padding: 35px 30px 15px 30px;
+  width: 18.51851851851852vw;
+}
+
+.contactCard a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contactCardUAE {
+  width: 350px;
+}
+
+.contactImgContainer {
+  margin-bottom: 20px;
+}
+
+.contactCardContents {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/*
+ * .contactUsContainer's `:is(h1..h6) { margin-top: 96px }` is meant to space
+ * out top-level page section headings, but as a descendant selector it also
+ * catches this card's nested city <h3> — stacking on top of the pin icon's
+ * own spacing and blowing the gap out to over 100px. Same specificity, later
+ * in the cascade, so this wins without needing !important.
+ */
+.contactCardContents :is(h1, h2, h3, h4, h5, h6) {
+  margin-top: 0;
+}
+
+.contactCardContents p {
+  color: #fff;
+  text-align: center;
+}
+
+.jeddah {
+  color: #fff;
+  margin-bottom: 15px;
+  font-size: 21px;
+}
+
+.cardDesc {
+  margin-bottom: 15px;
+  width: 105%;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.numberContainer {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px 0;
+  width: 130%;
+}
+
+.numberContainer a {
+  color: #fff;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.container2 {
+  padding: 0 135px;
+}
+
+.formContainer {
+  background: #f7f7f8;
+  padding: 50px 45px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.formContainer div {
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+}
+
+.formContainer label {
+  color: #02040e;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+}
+
+.formContainer input {
+  height: 55px;
+  height: 62px;
+  margin-top: 16px;
+  border: 1px solid #d3d3d3;
+  padding: 25px 0px 25px 30px;
+  background: #f7f7f8;
+}
+
+.formContainer input::placeholder {
+  font-size: 14px;
+}
+
+.formContainer .textBox {
+  width: 100%;
+}
+
+.textBox textarea {
+  margin-top: 16px;
+  border: 1px solid #d3d3d3;
+  padding: 25px 0px 0px 30px;
+  height: 216px;
+  background: #f7f7f8;
+}
+
+.formContainer .formSubmit {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.formSubmit button {
+  width: 280px;
+  height: 65px;
+
+  border-radius: 76px;
+  background: #13670b;
+
+  color: #fff;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 120%;
+  /* 19.2px */
+  text-transform: uppercase;
+}
+
+@media (min-width: 601px) and (max-width: 1280px) {
+  .container1 {
+    padding: 0 60px;
+  }
+
+  .container2 {
+    padding: 0 60px;
+  }
+
+  .formContainer div {
+    width: 47%;
+  }
+
+  .container3 {
+    padding: 0 60px;
+  }
+}
+
+@media (max-width: 600px) {
+  .contactUsContainer :is(h1, h2, h3, h4, h5, h6) {
+    text-align: center;
+  }
+
+  .contactUsContainer {
+    gap: 50px;
+    align-items: center;
+  }
+
+  .contactUsContainer .mBusinessDesc1 {
+    display: flex;
+    text-align: center;
+    color: #02040e;
+    margin-top: 125px;
+    margin-bottom: 30px;
+  }
+
+  .container1 {
+    padding: 0 6.4vw;
+  }
+
+  .loctaionButtonContainer {
+    gap: 15px;
+    margin-top: -40px;
+    margin-bottom: 30px;
+
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .loctaionButtonContainer .ksa {
+    width: 40.266666666666666vw;
+    height: 10.133333333333333vw;
+    font-size: 3.2vw;
+  }
+
+  .loctaionButtonContainer .uae {
+    display: none;
+  }
+
+  .loctaionButtonContainer .mUae {
+    display: flex !important;
+    width: 151px;
+    height: 38px;
+    font-size: 12px;
+  }
+
+  .loctaionButtonContainer .mUae {
+    display: none;
+  }
+
+  .contactMainCard {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4vw;
+  }
+
+  .contactCard {
+    padding: 20px;
+    width: 100%;
+  }
+
+  .contactImgContainer {
+    width: 60px;
+    height: 60px;
+  }
+
+  .contactCardContents p {
+    font-size: 12px;
+    width: 80%;
+  }
+
+  .jeddah {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .numberContainer {
+    width: 115%;
+  }
+
+  .container2 {
+    padding: 0 24px;
+  }
+
+  .formContainer {
+    padding: 20px 15px;
+    gap: 15px;
+  }
+
+  .formContainer label {
+    font-size: 12px;
+  }
+
+  .formContainer input {
+    height: 52px;
+    width: 80vw;
+    margin-top: 10px;
+    padding-left: 15px;
+  }
+
+  .formContainer textarea {
+    width: 80vw;
+    padding-left: 15px;
+  }
+
+  .formSubmit button {
+    width: 159px;
+    height: 38px;
+    font-size: 12px;
+  }
+
+  .footerContainer :is(h1, h2, h3, h4, h5, h6) {
+    text-align: left;
+  }
+}

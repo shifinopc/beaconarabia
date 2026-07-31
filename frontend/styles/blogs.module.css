@@ -1,0 +1,210 @@
+.mainContainer {
+  padding: 6.613756613756613vw 9.920634920634921vw;
+  padding-bottom: 0;
+}
+
+.mainContainer :is(h1, h2, h3, h4, h5, h6) {
+  width: 52.910052910052904vw;
+  margin: 0 auto 1.3227513227513228vw auto;
+  font-size: 2.6455026455026456vw;
+}
+
+.locationDateContainer {
+  font-size: 1.0582010582010581vw;
+  color: #13670b !important;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4629629629629629vw;
+  margin-bottom: 1.984126984126984vw;
+}
+
+.dot {
+  background-color: #13670b;
+  width: 0.3306878306878307vw;
+  height: 0.3306878306878307vw;
+  border-radius: 0.3306878306878307vw;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.content img {
+  width: 73.54497354497354vw !important;
+  /* height: 33.06878306878307vw !important; */
+  object-fit: cover;
+  object-position: top;
+  margin-bottom: 1.984126984126984vw;
+}
+
+.description {
+  width: 66.93121693121694vw;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.description p {
+  font-size: 1.0582010582010581vw;
+}
+
+
+
+.blogsh2 {
+  font-size: 2.6455026455026456vw;
+  margin: 0 auto 1.3227513227513228vw auto;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  text-transform: capitalize;
+}
+
+.blogsh3 {
+  font-size: 2.6455026455026456vw;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  text-transform: capitalize;
+}
+
+.blogsh4 {
+  font-size: 2.6455026455026456vw;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  text-transform: capitalize;
+}
+
+.blogsh5 {
+  font-size: 1.8455026455026456vw;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  text-transform: capitalize;
+  color: #13670b;
+}
+
+.blogsh6 {
+  font-size: 1.3455026455026456vw;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  text-transform: capitalize;
+  
+}
+
+.blogsp {
+  font-size: 1.0582010582010581vw;
+}
+
+.blogsli {
+  font-size: 1.0582010582010581vw;
+  list-style-type: none;
+  padding-left: 3em;
+  padding-right: 8vw;
+  
+  color: #58595B;
+}
+
+.blogsli:before {
+  content: "\25CF"; 
+  color: #13670b;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+@media (max-width: 600px) {
+  .mainContainer {
+    margin-top: 125px;
+    padding: 0 6.4vw;
+  }
+
+  .mainContainer .blog {
+    width: auto;
+    color: #02040e;
+  }
+
+  .locationDateContainer {
+    font-size: 3.2vw;
+  }
+
+  .content img {
+    width: 87.2vw !important;
+    height: 50.971199999999996vw !important;
+    margin-bottom: 5.333333333333334vw;
+  }
+
+  .description {
+    width: auto;
+  }
+
+  .description p {
+    font-size: 2.8582010582010581vw;
+  }
+
+  .blogtopmargin {
+    margin-top: 25.333333333333334vw;
+  }
+
+  .blogsh2 {
+    font-size: 2.6455026455026456vw;
+    margin: 0 auto 1.3227513227513228vw auto;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 140%;
+    text-transform: capitalize;
+  }
+  
+  .blogsh3 {
+    font-size: 2.6455026455026456vw;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 140%;
+    text-transform: capitalize;
+  }
+  
+  .blogsh4 {
+    font-size: 2.6455026455026456vw;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 140%;
+    text-transform: capitalize;
+  }
+  
+  .blogsh5 {
+    font-size: 4.8455026455026456vw;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 140%;
+    text-transform: capitalize;
+  }
+  
+  .blogsh6 {
+    font-size: 3.8455026455026456vw !important;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 140%;
+    text-transform: capitalize;
+  }
+  
+  .blogsp {
+    font-size: 2.8582010582010581vw;
+    text-align: left;
+  }
+  
+  .blogsli {
+    font-size: 2.7582010582010581vw !important;
+    padding-left: 1em;
+    color: #58595B !important;
+    text-align: left;
+  }
+  
+  .blogsli:before {
+    display: inline-block;
+  }
+}

@@ -1,0 +1,283 @@
+.companyBlog {
+  padding: 0 9.920634920634921vw;
+}
+
+.text1 {
+  font-size: 1.0582010582010581vw !important;
+  line-height: 1.2698412698412698vw;
+  margin-bottom: 0.6613756613756614vw;
+  color: #13670b;
+  text-align: center;
+  font-weight: 600;
+}
+
+.text2 {
+  font-size: 2.6455026455026456vw !important;
+  font-weight: 600;
+  color: #02040e;
+  line-height: 3.7037037037037033vw;
+  margin-bottom: 4.62962962962963vw;
+  text-align: center;
+}
+
+.companyBlogCards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.984126984126984vw;
+}
+
+.companyBlogCard {
+  display: flex;
+  flex-direction: column;
+  width: 24.396825396825395vw;
+}
+
+.companyBlogCard2{
+  display: flex;
+  flex-direction: column;
+  width: 50.596825396825395vw;
+}
+
+.blogImage {
+  width: 50.596825396825395vw;
+  height: 16.534391534391535vw;
+  object-fit: cover;
+  margin-bottom: 0.992063492063492vw;
+}
+
+.dateAndLocationContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.3227513227513228vw;
+}
+
+.dateTextContainer {
+  width: auto;
+  padding: 0px 1.5227513227513228vw;
+  border-radius: 14.814814814814813vw;
+  height: 2.513227513227513vw;
+  background-color: #13670b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4629629629629629vw;
+
+  font-size: 1.0582010582010581vw !important;
+  color: #fff;
+}
+
+.blogDot {
+  width: 0.3306878306878307vw;
+  height: 0.3306878306878307vw;
+  border-radius: 0.3306878306878307vw;
+  background-color: #fff;
+}
+
+.readmore{
+  display: flex;
+  flex-direction: row;
+  gap: 0.4629629629629629vw;
+  padding-top: 0.4629629629629629vw;
+}
+
+.blogArrow {
+  width: 1.21640211640212vw;
+  height: 1.21640211640212vw;
+  align-self: center;
+}
+
+.text5 {
+  color: #02040e;
+  font-size: 1.5873015873015872vw !important;
+  line-height: 1.9047619047619049vw;
+  font-style: normal;
+  font-weight: 500;
+  text-transform: capitalize;
+  margin-bottom: 0.5952380952380952vw;
+  max-height: 3.835978835978836vw;
+  overflow: hidden;
+}
+
+.text6 {
+  color: #58595b;
+  font-size: 1.0582010582010581vw !important;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.4814814814814814vw;
+
+  max-height: 4.365079365079365vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.companyBlog .blogButton {
+  width: 15.41005291005291vw;
+  height: 4.298941798941799vw;
+  background-color: transparent;
+  border: 1px solid #02040e;
+  padding: 0;
+
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+  margin-top: 3.3068783068783065vw;
+}
+
+.blogButton .blogButtonText {
+  font-size: 1.0582010582010581vw !important;
+  line-height: 1.2698412698412698vw !important;
+
+  color: #02040e;
+  font-style: normal;
+  font-weight: 500;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: height 0.6s ease;
+  z-index: 1;
+}
+
+.blogButtonText img {
+  width: 1.5211640211640212vw;
+  height: 1.5211640211640212vw;
+}
+
+.blogButton .blogButtonText .topBlogArrow {
+  transform: translate(310%, -55%);
+}
+
+.bottomBlogArrow {
+  transform: translate(175.5%, -120%);
+}
+
+@media (max-width: 600px) {
+  .companyBlog {
+    padding: 0 6.4vw;
+  }
+
+  .text1 {
+    font-size: 3.2vw !important;
+    line-height: 3.8400000000000003vw;
+    text-align: center;
+    margin-bottom: 1.3333333333333335vw;
+  }
+
+  .text2 {
+    font-size: 6.4vw !important;
+    line-height: 8.959999999999999vw;
+    text-align: center;
+    margin-bottom: 8vw;
+  }
+
+  .companyBlogCards {
+    flex-wrap: wrap;
+    gap: 4vw;
+  }
+
+  .companyBlogCard {
+    width: 41.6vw;
+  }
+  .companyBlogCard2{
+    width: 41.6vw;
+  }
+
+  .blogImage {
+    width: 41.6vw;
+    height: 27.083466666666666vw;
+    margin-bottom: 4vw;
+  }
+
+  .dateAndLocationContainer {
+    width: auto;
+    margin-bottom: 2.666666666666667vw;
+  }
+
+  .blogDot {
+    display: none;
+  }
+
+  .dateTextContainer {
+    width: auto;
+    padding: 0px 2.666666666666667vw;
+    border-radius: 22.133333333333333vw;
+    height: 6.4vw;
+    background-color: #13670b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4629629629629629vw;
+
+    font-size: 1.0582010582010581vw !important;
+    color: #fff;
+    font-size: 2.666666666666667vw !important;
+  }
+
+  .text4 {
+    font-size: 2.566666666666667vw !important;
+  }
+
+  .text3 {
+    display: none;
+  }
+
+  .blogArrow {
+    width: 3.733333333333334vw;
+    height: 3.733333333333334vw;
+  }
+
+  .text5 {
+    font-size: 3.733333333333334vw !important;
+    line-height: 4.4799999999999995vw;
+    max-height: 9.333333333333334vw;
+    margin-bottom: 1.3333333333333335vw;
+  }
+
+  .text6 {
+    font-size: 3.2vw !important;
+    line-height: 4.4799999999999995vw;
+    max-height: 13.600000000000001vw;
+
+  }
+
+  .companyBlog .blogButton {
+    width: 45.33333333333333vw;
+    height: 11.733333333333333vw;
+    background-color: transparent;
+    border: 1px solid #02040e;
+    padding: 0;
+
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+    margin-top: 8vw;
+  }
+
+  .blogButton .blogButtonText {
+    font-size: 3.2vw !important;
+    line-height: 3.8400000000000003vw !important;
+
+    color: #02040e;
+    font-style: normal;
+    font-weight: 500;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: height 0.6s ease;
+    z-index: 1;
+  }
+
+  .blogButtonText img {
+    width: 3.733333333333334vw;
+    height: 3.733333333333334vw;
+  }
+
+
+}

@@ -1,0 +1,125 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3.968253968253968vw;
+}
+
+.rightContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  color: #fff;
+  gap: 1.5873015873015872vw;
+}
+
+.imageContainer {
+  width: 5.291005291005291vw;
+  height: 5.291005291005291vw;
+}
+
+.title {
+  font-size: 1.8518518518518516vw;
+  font-weight: 500;
+  margin-bottom: 0.9259259259259258vw;
+}
+
+.leftContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.input {
+  width: 25.595238095238095vw;
+  height: 4.365079365079365vw;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0 1.3227513227513228vw;
+  border: none;
+  color: #fff;
+  outline: none;
+}
+
+.button {
+  background: rgba(10, 53, 6, 1);
+  height: 4.365079365079365vw;
+  padding: 1.3227513227513228vw 2.1164021164021163vw;
+  color: #fff;
+  font-size: 1.0582010582010581vw;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.button:hover {
+  background: rgba(10, 53, 6, 0.4);
+  transition: all 0.3s ease-in-out;
+}
+
+.hrLine {
+  width: 100%;
+  margin-bottom: 4.62962962962963vw;
+}
+
+@media only screen and (max-width: 767px) {
+  .container {
+    flex-direction: column;
+    margin-bottom: 5.333333333333334vw;
+  }
+
+  .rightContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    color: #fff;
+    gap: 4.266666666666667vw;
+  }
+
+  .title {
+    font-size: 4.266666666666667vw;
+    font-weight: 500;
+    margin-bottom: 2.1333333333333333vw;
+  }
+
+  .description {
+    font-size: 3.2vw;
+    font-weight: normal;
+    margin-bottom: 5.333333333333334vw;
+  }
+
+  .leftContainer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .input {
+    width: 59.73333333333334vw;
+    height: 14.133333333333335vw;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0 5.333333333333334vw;
+    border: none;
+    color: #fff;
+    outline: none;
+  }
+
+  .button {
+    background: rgba(10, 53, 6, 1);
+    height: 14.133333333333335vw;
+    padding: 3.5999999999999996vw 5.333333333333334vw;
+    color: #fff;
+    font-size: 3.2vw;
+    cursor: default;
+    transition: all 0.3s ease-in-out;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .imageContainer {
+    width: 13.333333333333334vw;
+    height: 13.333333333333334vw;
+  }
+}

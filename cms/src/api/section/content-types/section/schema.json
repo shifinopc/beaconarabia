@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sections",
+  "info": {
+    "singularName": "section",
+    "pluralName": "sections",
+    "displayName": "Section",
+    "description": "A keyed content block on a page — heading, copy and an optional list of cards. Used for sections that exist on only some regions, so each one does not need its own content type."
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "key": {
+      "type": "string",
+      "required": true,
+      "description": "Stable identifier the frontend looks the section up by, e.g. home-investment, why-benefits."
+    },
+    "eyebrow": {
+      "type": "string",
+      "description": "Small label above the heading (the legacy sectionName)."
+    },
+    "title": { "type": "string", "required": true },
+    "description": { "type": "text" },
+    "bullets": {
+      "type": "json",
+      "description": "Optional list of strings rendered under the description."
+    },
+    "ctaLabel": { "type": "string" },
+    "ctaHref": { "type": "string" },
+    "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "section.card"
+    },
+    "order": { "type": "integer", "default": 0 },
+    "region": {
+      "type": "enumeration",
+      "enum": ["global", "ae", "sa"],
+      "required": true,
+      "default": "global"
+    }
+  }
+}

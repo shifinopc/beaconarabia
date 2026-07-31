@@ -1,0 +1,21 @@
+{
+  "kind": "singleType",
+  "collectionName": "site_settings",
+  "info": {
+    "singularName": "site-setting",
+    "pluralName": "site-settings",
+    "displayName": "Site Settings",
+    "description": "Company-wide contact details and social links used in the header and footer."
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "email": { "type": "string" },
+    "phones": { "type": "json" },
+    "whatsapp": { "type": "string" },
+    "officeAddress": { "type": "text" },
+    "officeMapUrl": { "type": "string" },
+    "socials": { "type": "json" },
+    "copyrightHolder": { "type": "string" }
+  }
+}

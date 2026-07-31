@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_section_cards",
+  "info": {
+    "displayName": "Card",
+    "description": "One card inside a Section — heading, copy, optional badge and image."
+  },
+  "options": {},
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "description": { "type": "text" },
+    "badge": {
+      "type": "string",
+      "description": "Small marker shown on the card, e.g. the step number 01."
+    },
+    "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] }
+  }
+}

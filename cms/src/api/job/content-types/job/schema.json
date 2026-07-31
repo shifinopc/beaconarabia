@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "jobs",
+  "info": {
+    "singularName": "job",
+    "pluralName": "jobs",
+    "displayName": "Job",
+    "description": "An open position listed on the careers page."
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "employmentType": { "type": "string", "default": "Full Time" },
+    "location": { "type": "string" },
+    "details": { "type": "json" },
+    "order": { "type": "integer", "default": 0 },
+    "region": {
+      "type": "enumeration",
+      "enum": ["global", "ae", "sa"],
+      "required": true,
+      "default": "global"
+    }
+  }
+}

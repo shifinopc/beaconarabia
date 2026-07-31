@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "career_highlights",
+  "info": {
+    "singularName": "career-highlight",
+    "pluralName": "career-highlights",
+    "displayName": "Career Highlight",
+    "description": "A company value or employee perk shown on the careers page."
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "kind": {
+      "type": "enumeration",
+      "enum": ["value", "perk"],
+      "required": true,
+      "default": "value"
+    },
+    "title": { "type": "string", "required": true },
+    "description": { "type": "text" },
+    "icon": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "order": { "type": "integer", "default": 0 },
+    "region": {
+      "type": "enumeration",
+      "enum": ["global", "ae", "sa"],
+      "required": true,
+      "default": "global"
+    }
+  }
+}

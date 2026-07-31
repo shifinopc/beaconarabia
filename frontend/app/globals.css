@@ -1,0 +1,140 @@
+/*
+ * Cascade layer order.
+ *
+ * The ported legacy stylesheet must override Tailwind's preflight (it defines
+ * the whole design), but Tailwind *utilities* must be able to override the
+ * legacy sheet — otherwise a class like `text-white` on a <p> loses to the
+ * legacy `p { color: #58595b }` rule.
+ *
+ * Unlayered CSS beats every layer regardless of specificity, so importing the
+ * legacy sheet unlayered silently disabled every Tailwind utility used
+ * alongside it. Putting it in its own layer between base and components fixes
+ * that in both directions.
+ */
+@layer theme, base, legacy, components, utilities;
+
+/**
+ * Visually hidden, still readable by screen readers/crawlers. Unlayered (like
+ * the legacy sheet is deliberately not) so nothing in it can beat this — a
+ * heading meant to be invisible must actually stay invisible.
+ *
+ * Used for structural headings the legacy design has no visible slot for —
+ * e.g. giving the Contact page's office list and enquiry form a real <h2>
+ * each, so the outline doesn't jump straight from the page's <h1> to the
+ * office-card <h3>s with nothing in between.
+ */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@import "tailwindcss";
+
+/* Ported verbatim from the legacy global site (bg-Beacon/src/app/globals.css).
+   Contains the full homepage design: layout, cards, buttons, responsive rules. */
+@import "./legacy-design.css" layer(legacy);
+
+/*
+ * Base styles carried over from the legacy Beacon sites.
+ * Note: the old design sized type in `vw` units (e.g. `font-size: 1.04vw`),
+ * which breaks down badly below ~1000px. Kept here for visual parity during
+ * the migration; worth replacing with clamp() or Tailwind's responsive scale.
+ */
+
+:root {
+  --brand-body: #58595b;
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sora);
+}
+
+/* In the `legacy` layer so Tailwind utilities can still override these —
+   notably the `* { padding: 0 }` reset, which otherwise beats `py-3` etc. */
+@layer legacy {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sora), system-ui, sans-serif;
+
+    /* Hidden scrollbar, as on the legacy sites. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scrollbar-color: transparent transparent;
+  }
+
+  body::-webkit-scrollbar {
+    width: 0;
+  }
+
+  body::-webkit-scrollbar-thumb {
+    background-color: transparent;
+  }
+
+  li {
+    cursor: pointer;
+  }
+
+  /*
+   * Consistent breathing room above the footer on every page.
+   *
+   * The legacy design left whatever section came last butting straight against
+   * the footer, and each page solved it (or didn't) on its own. One rule on the
+   * footer covers every page — homepage, About, Services, Contact, Blog and the
+   * regional variants — instead of per-page padding that has to be remembered
+   * each time a section is added.
+   */
+  .footerContainer {
+    margin-top: 100px;
+  }
+
+  @media (min-width: 601px) and (max-width: 1280px) {
+    .footerContainer {
+      margin-top: 80px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .footerContainer {
+      margin-top: 60px;
+    }
+  }
+
+  /*
+   * Floating WhatsApp button.
+   *
+   * The ported design sizes it in `vw` (5vw desktop / 12vw mobile), so it was
+   * 72px at 1440px and would reach ~128px on a 2560px display. Clamped to a
+   * sensible range instead — smaller overall, and it stops growing on large
+   * monitors. These rules follow the imported legacy sheet within the same
+   * layer, so they win on equal specificity.
+   */
+  .chat-icon {
+    width: clamp(44px, 3.2vw, 52px);
+    height: clamp(44px, 3.2vw, 52px);
+  }
+
+  @media (max-width: 600px) {
+    .chat-icon {
+      width: 44px;
+      height: 44px;
+    }
+  }
+}

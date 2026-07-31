@@ -1,0 +1,593 @@
+.businessDesc {
+    color: #02040E;
+    text-align: center;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 140%;
+    text-transform: capitalize;
+}
+
+.contactUsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
+    margin-top: 96px;
+}
+
+.container1 {
+    display: flex;
+    padding: 0 135px;
+    flex-direction: column;
+    /* align-items: center; */
+}
+
+.subHeading {
+    font-size: 16px;
+    font-weight: 400;
+    color: #58595B;
+    padding-top: 20px;
+    text-align: center;
+    margin: 0px auto;
+    padding: 0px 135px;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+
+.servicesPageContainer2 {
+    background-color: rgba(247, 247, 248, 1);
+    display: flex;
+    gap: 80px;
+    align-items: center;
+}
+
+.servicesPageContainer3 {
+    padding: 100px 135px;
+    background-color: rgba(247, 247, 248, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 70px;
+}
+
+.servicePageImageContainer2 {
+    width: 561px;
+    flex: 1;
+}
+
+.container2Contents {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: justify;
+}
+
+.container2Contents :is(h1, h2, h3, h4, h5, h6) {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.servicePagecontainer2MobileHeading {
+    display: none;
+}
+
+.container2 {
+    /* padding: 0 135px; */
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+    gap: 50px;
+}
+
+.container2Card {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+}
+
+.container2Card .title {
+    font-size: 24px;
+    font-weight: 500;
+    color: #02040E;
+    margin-top: 0px;
+    text-transform: capitalize;
+    grid-column: span 1;
+}
+
+.container2Card .desc {
+    font-size: 16px;
+    font-weight: 400;
+    color: #58595B;
+    text-align: justify;
+}
+
+.Imagecontainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.aboutHeroImage {
+    margin-top: 70px;
+    width: 82.35677083333334vw !important;
+    height: 42.31770833333333vw !important;
+    object-fit: cover;
+    object-position: center;
+}
+
+.CareersContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 70px;
+    padding: 0px 135px;
+}
+
+.CardContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    width: 100%;
+    row-gap: 50px;
+    column-gap: 30px;
+}
+
+.CareersCard {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.CareersCard .title {
+    font-size: 24px;
+    font-weight: 500;
+    color: #02040E;
+    margin-top: 0px;
+    text-transform: capitalize;
+}
+
+.CareersCard .desc {
+    font-size: 16px;
+    font-weight: 400;
+    color: #58595B;
+    text-align: left;
+}
+
+.mbusinessDesc {
+    display: none;
+}
+
+.iconContainer {
+    width: 35px;
+    height: 35px;
+}
+
+.faqMainContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 70px;
+    padding: 0px 135px;
+}
+
+.faqContainer {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+.faqLeft {
+    flex: 90%;
+}
+
+.faqLeft .businessHeading {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.faqLeft .businessDesc {
+    text-align: left;
+}
+
+.faqRight {
+    flex: 70%;
+    display: flex;
+    cursor: pointer;
+    padding: 30px 15px;
+    border-bottom: 1.5px solid #ECECF1;
+
+}
+
+.faqRight:first-child {
+    margin: 0px;
+}
+
+.faqNumber {
+    color: #13670B;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 120%;
+    /* 28.8px */
+    text-transform: capitalize;
+}
+
+.faqContentContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.faqQuestion {
+    width: 50%;
+    display: flex;
+    align-items: center;
+}
+
+.faqQuestion :is(h1, h2, h3, h4, h5, h6) {
+    color: #02040E;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 120%;
+    /* 28.8px */
+    text-transform: capitalize;
+}
+
+.faqDesc {
+    color: #58595B;
+    /* font-size: 15px; */
+    display: flex;
+    flex-direction: column;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+}
+
+.faqDesc {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out;
+}
+
+.icon {
+    width: 50px;
+    height: 50px;
+}
+
+/* .faqDesc :first-child {
+    margin-top: 20px;
+  } */
+
+.faqDesc.open {
+    max-height: 2500px;
+}
+
+.faqAddIcon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.4s ease-in-out;
+    transform: rotate(0deg);
+    margin: auto 0px;
+}
+
+.rotateIcon {
+    transform: rotate(-45deg);
+}
+
+.faqContentMainContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top: 1.5px solid #ECECF1;
+}
+
+.faqdesc2 {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    margin-left: auto;
+    margin-right: 30px;
+    width: 25%;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    border: 1.5px solid #13670B;
+    cursor: pointer;
+    padding: 8px 20px;
+    border-radius: 90px;
+}
+
+.faqHeading {
+    color: #02040E;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 28px;
+    text-transform: capitalize;
+    margin-top: 20px;
+}
+
+.faqButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 16px;
+    font-weight: 400;
+    background-color: #13670B;
+    cursor: pointer;
+    padding: 12px 20px;
+    border-radius: 90px;
+    margin-top: 30px;
+    margin-right: auto;
+    text-transform: capitalize;
+}
+
+
+.PartnersGreenbanner {
+    background-color: #13670B;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 50px 135px;
+}
+
+.LeftGreenBanner {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bannerHeading {
+    color: #FFFFFF;
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.bannersubHeading {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+}
+
+.RightGreenBanner {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.PartnersGreenbannerButton {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+
+}
+
+@media (max-width: 600px) {
+
+    .businessDesc {
+        font-size: 24px;
+    }
+
+    /* .contactUsContainer :is(h1, h2, h3, h4, h5, h6) {
+        text-align: center;
+    } */
+
+    .contactUsContainer {
+        gap: 40px;
+        align-items: center;
+        margin-top: 0px;
+    }
+
+    .contactUsContainer .mBusinessDesc1 {
+        display: flex;
+        text-align: center;
+        color: #02040E;
+    }
+
+    .Imagecontainer {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-top: 100px;
+    }
+
+    .subHeading {
+        font-size: 12px;
+        font-weight: 400;
+        color: #58595B;
+        padding-top: 10px;
+        text-align: center;
+        margin: 0px auto;
+        width: 80vw;
+        padding: 0px 24px;
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+
+    .mbusinessDesc {
+        display: block;
+        color: #02040E;
+        font-size: 16px;
+        font-style: normal;
+        padding: 0px 24px;
+        text-align: center;
+        margin-top: 0px;
+
+    }
+
+    .aboutHeroImage {
+        margin-top: 20px;
+        height: 350px !important;
+        width: 100%;
+    }
+
+
+    .container2 {
+        display: flex;
+        flex-direction: column;
+        margin-top: 0px;
+        gap: 15px;
+    }
+
+    .container2Card {
+        display: flex;
+        flex-direction: column;
+        gap: 0px;
+    }
+
+    .container2Card .desc {
+        font-size: 12px;
+    }
+
+    .CareersCard .desc {
+        font-size: 12px;
+    }
+
+    .CareersCard {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .CareersContainer {
+        gap: 30px;
+        padding: 0px 24px;
+    }
+
+    .CardContainer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 20px;
+    }
+
+    .title {
+        text-align: left;
+        font-size: 16px !important;
+    }
+
+    .icon {
+        width: 25px !important;
+        height: 25px !important;
+    }
+
+    .footerContainer :is(h1, h2, h3, h4, h5, h6) {
+        text-align: left;
+    }
+
+    .servicesPageContainer2 {
+        padding: 40px 24px;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .servicesPageContainer2 .servicePageImageContainer2 {
+        width: auto;
+        height: auto;
+    }
+
+    .servicesPageContainer2 .servicePagecontainer2MobileHeading {
+        display: flex;
+        color: #02040E;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 140%;
+        /* 33.6px */
+        text-transform: capitalize;
+        margin-bottom: 10px;
+    }
+
+    .faqMainContainer {
+        padding: 0 24px;
+        gap: 20px;
+    }
+
+    .faqRight {
+        gap: 15px;
+        padding: 15px 0px;
+    }
+
+    .faqContentContainer {
+        width: auto;
+    }
+
+    .faqQuestion {
+        width: 90%;
+    }
+
+    .faqQuestion :is(h1, h2, h3, h4, h5, h6) {
+        font-size: 16px;
+        text-align: left;
+    }
+
+    .faqHeading {
+        font-size: 14px !important;
+        text-align: left;
+        margin-top: 10px;
+    }
+
+    .faqDesc p {
+        font-size: 12px;
+        text-align: left;
+    }
+
+    .faqButton {
+        font-size: 14px;
+        padding: 10px 20px;
+        margin-top: 15px;
+    }
+
+    /* .faqQuestionContainer{
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    } */
+
+    .faqdesc2 {
+        display: none;
+    }
+
+    .PartnersGreenbanner {
+        display: flex;
+        flex-direction: column;
+        padding: 40px 25px;
+        gap: 20px;
+        text-align: left !important;
+    }
+
+    .LeftGreenBanner {
+        gap: 8px;
+        
+    }
+
+    .bannerHeading {
+        font-size: 24px;
+        text-align: left;
+    }
+
+    .bannersubHeading {
+        font-size: 12px;
+    }
+
+}

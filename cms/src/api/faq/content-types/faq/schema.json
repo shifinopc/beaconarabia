@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "faqs",
+  "info": {
+    "singularName": "faq",
+    "pluralName": "faqs",
+    "displayName": "FAQ",
+    "description": "Frequently asked question, per region."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "question": {
+      "type": "string",
+      "required": true
+    },
+    "answer": {
+      "type": "text",
+      "required": true
+    },
+    "region": {
+      "type": "enumeration",
+      "enum": [
+        "global",
+        "ae",
+        "sa"
+      ],
+      "required": true,
+      "default": "global"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

@@ -1,0 +1,30 @@
+node_modules/
+.env
+.env.local
+.env*.local
+.DS_Store
+*.log
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/next-env.d.ts
+
+# Strapi
+cms/.tmp/
+cms/.cache/
+cms/build/
+cms/dist/
+cms/.strapi/
+cms/public/uploads/*
+!cms/public/uploads/.gitkeep
+
+# Deployment artifacts.
+#
+# The zips are regenerable build output (~49 MB). The SQL dumps carry the
+# admin password hash and the API-token hashes along with the content, so they
+# are credential material as much as data — they belong in a backup location,
+# not in a shared repository. See DEPLOYMENT.md for how to regenerate both.
+deploy/*.zip
+deploy/*.sql
+deploy/db-parts/

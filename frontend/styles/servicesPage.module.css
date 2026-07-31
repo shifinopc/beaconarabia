@@ -1,0 +1,485 @@
+.servicePageMainContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 118px;
+}
+
+.servicePageMainContainer :is(h1, h2, h3, h4, h5, h6) {
+    margin-top: 80px;
+}
+
+.servicePageMainContainer .mBusinessDesc1{
+    display: none;
+}
+
+.servicePageMainContainer .servicePageMCardMainContainer{
+    padding: 0 135px;
+    margin-top: -65px;
+}
+
+/*
+ * .servicePageMainContainer's `:is(h1..h6) { margin-top: 80px }` above is
+ * meant to space out the page's own section headings, but as a descendant
+ * selector it also lands on each card's own <h3>, stacking on top of
+ * .imgContainer's margin-bottom and blowing the icon-to-heading gap out to
+ * ~110px. Same specificity, later in the cascade, so this wins without
+ * needing !important.
+ */
+.servicePageMCardMainContainer :is(h1, h2, h3, h4, h5, h6) {
+    margin-top: 0;
+}
+
+.sPagecardContainerOverlay{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+.overLayDesc{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .sPagecardContainerOverlay :is(h1, h2, h3, h4, h5, h6){
+    margin: 0 !important;
+    color: #FFF;
+    text-align: center;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 120%; /* 28.8px */
+    text-transform: capitalize;
+  }
+  
+  .sPagecardContainerOverlay p {
+    color: rgba(255, 255, 255, 0.80);
+    text-align: center;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+  }
+
+.servicesPageContainer2{
+    padding: 100px 135px;
+    background-color: rgba(247, 247, 248, 1);
+    display: flex;
+    gap: 80px;
+    align-items: center;
+}
+
+.servicePageImageContainer2{
+    width: 561px;
+    flex: 1;
+}
+
+.container2Contents{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: justify;
+}
+
+.container2Contents :is(h1, h2, h3, h4, h5, h6){
+    text-align: left;
+    margin-bottom: 20px;
+}
+.cont2Button{
+    margin-top: 30px;
+}
+.cont3Button{
+    /* width: 220px;
+    height: 60px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden; */
+    margin-top: 30px;
+}
+.servicePagecontainer2MobileHeading{
+    display: none;
+}
+
+.container3{
+    padding: 0 135px;
+    display: flex;
+    flex-direction: column;
+    gap: 70px;
+}
+
+.servicePagecontainer2MobileHeading{
+    display: none;
+}
+
+.container3SellingCard{
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.sellingCards{
+    display: flex;
+    gap: 30px;
+    background: #F7F7F8;
+    padding: 30px 45px 30px 30px;
+    justify-content: space-between;
+    width: 48%;
+}
+
+.sellingImageContainer{
+    width: 150px;
+    height: 80px;
+}
+
+.container3Contents{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 67.2vw;
+}
+
+/* Same bleed-through as .servicePageMCardMainContainer above, on the "Why
+   Choose Us" selling cards' own headings. */
+.container3Contents :is(h1, h2, h3, h4, h5, h6) {
+    margin-top: 0;
+}
+
+.container3Contents p {
+    text-align: left;
+}
+
+.container4 {
+    padding: 70px 135px;
+    display: flex;
+    position: relative;
+    gap: 60px;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.background{
+    width: 63%;
+    height: 100%;
+    position: absolute;
+    background: #F7F7F8;
+    z-index: -1;
+}
+
+.container4ImgContainer{
+    width: 450px;
+    height: 450px;
+    display: flex;
+    justify-content: center;
+}
+
+.container4ImgContainer img{
+    object-fit: cover;
+}
+
+.container4Contents{
+    flex: 1;
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    padding-left: 80px;
+}
+
+.container4Contents :is(h1, h2, h3, h4, h5, h6){
+    text-align: left;
+}
+
+.container4Contents p{
+    text-align: justify;
+}
+
+.marginContainer .testimonialMainContainerServicePage{
+    margin-top: 0px;
+}
+
+.testimonialLeftContainer :is(h1, h2, h3, h4, h5, h6){
+    margin-top: 0;
+}
+
+.mTestimonialHeading{
+    display: none;
+}
+
+
+
+@media (min-width: 601px) and (max-width: 1280px) {
+
+    .servicePageMainContainer .servicePageMCardMainContainer{
+        padding: 0 60px;
+    }
+
+    .servicesPageContainer2{
+        padding: 70px 60px;
+    }
+
+    .container3{
+        padding: 0 60px;
+    }
+
+    .container4{
+        padding: 70px 60px;
+    }
+
+    .background{
+        left: -10px;
+    }
+
+    .container4Contents{
+        padding-left: 0;
+    }
+
+    .sellingCards{
+        width: 47%;
+    }
+}
+
+@media (max-width: 600px) {
+
+
+    .servicePageMainContainer :is(h1, h2, h3, h4, h5, h6){
+        color: #FFF;
+        text-align: center;
+        font-size: 24px ;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 140%;
+        text-transform: capitalize;
+        margin-top: 125px;
+    }
+
+    /*
+     * The rule above is meant for the page's own section headings, but as a
+     * descendant selector it also reaches each card's <h3> — white text on
+     * the cards' light background made them unreadable, on top of the same
+     * 125px margin-top bleed seen on desktop (there scaled to 80px). Same
+     * specificity, later in the cascade, so these win.
+     */
+    .servicePageMCardMainContainer :is(h1, h2, h3, h4, h5, h6),
+    .container3Contents :is(h1, h2, h3, h4, h5, h6) {
+        color: #02040E;
+        margin-top: 0;
+    }
+
+    .servicePageMainContainer{
+        gap: 50px;
+        align-items: center;
+    }
+
+    .servicePageMainContainer .mBusinessDesc1{
+        display: flex;
+        color: #02040E;
+        margin-top: 125px;
+        margin-bottom: 30px;
+        padding: 0 24px;
+    }
+
+    .servicePageMainContainer .servicePageMCardMainContainer{
+        padding: 0 24px;
+        margin-top: -50px;
+    }
+
+    .servicePageMCardMainContainer .sPagecardContainerOverlay{
+        display: flex;
+        position: relative;
+        height: 179px;
+    }
+
+    .servicePageMCardMainContainer .cardContainer:hover::before{
+        transition: none !important;
+    }
+
+    .cardContainer:hover .sPagecardContainerOverlay {
+        height: 179px !important;
+        transition: none !important;
+      }
+
+    .servicePageMCardMainContainer .cardContainer{
+        gap: 15px;
+    }
+
+    .cardContainer .imgContainer{
+        width: 60px;
+        height: 60px;
+    }
+
+    .cardContainer :is(h1, h2, h3, h4, h5, h6){
+        font-size: 16px;
+    }
+
+    .servicesDescContainer{
+        height: auto;
+    }
+
+    .sPagecardContainerOverlay :is(h1, h2, h3, h4, h5, h6){
+        display: none;
+    }
+
+    .overLayDesc{
+        gap: 5px;
+    }
+
+    .sPagecardContainerOverlay p{
+        font-size: 12px;
+    }
+
+    .serviceCardOverlayUL{
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .serviceCardOverlayUL li{
+        margin: 0;
+        color: rgba(255, 255, 255, 0.80);
+        text-align: center;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 140%;
+    }
+
+    .servicesPageContainer2{
+        padding: 40px 24px;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .servicesPageContainer2 .servicePageImageContainer2{
+        width: auto;
+        height: auto;
+    }
+
+    .servicesPageContainer2 .servicePagecontainer2MobileHeading{
+        display: flex;
+        color: #02040E;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 140%; /* 33.6px */
+        text-transform: capitalize;
+        margin-bottom: 10px;
+    }
+
+    .container2Contents p{
+        text-align: left;
+    }
+
+    .container3{
+        padding: 0 24px;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .container3 .servicePagecontainer2MobileHeading{
+        display: flex;
+        color: #02040E;
+        text-align: left;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 140%; /* 33.6px */
+        text-transform: capitalize;
+        margin-bottom: 10px;
+    }
+
+    .container3Contents :is(h1, h2, h3, h4, h5, h6){
+        font-size: 16px;
+    }
+
+    .sellingCards{
+        width: auto;
+        border-radius: 10px;
+        padding: 24px 15px 20px 15px;
+    }
+
+    .sellingImageContainer{
+        width: 8vw;
+        height: 8vw;
+    }
+
+    .servicesPageContainer{
+        padding: 0 24px;
+    }
+
+    .container4{
+        padding: 0 24px;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .container4ImgContainer{
+        width: 100%;
+        height: auto;
+        order: -1;
+    }
+
+    .background{
+        width: 100%;
+        height: 80%;
+        top: 152px;
+    }
+
+    .container4Contents{
+        padding: 0;
+        width: 100%;
+        order: 1;
+        gap: 10px;
+    }
+
+    .container4 .servicePagecontainer2MobileHeading{
+        display: flex;
+        color: #02040E;
+        text-align: left;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 140%; /* 33.6px */
+        text-transform: capitalize;
+        /* margin-bottom: 10px; */
+    }
+
+    .marginContainer{
+        margin-top: 30px;
+    }
+
+    .testimonialLeftContainer .mTestimonialHeading{
+        display: flex;
+        margin: 0;
+        margin-bottom: 5px;
+        color: #02040E;
+        text-align: left;
+    }
+
+    .cont3Button{
+        /* width: 145px;
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden; */
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    
+}
+
+
+
+
+

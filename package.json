@@ -1,0 +1,20 @@
+{
+  "name": "beacon-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Consolidated Beacon web platform: one Next.js frontend serving global/AE/SA, backed by a single Strapi 5 CMS.",
+  "scripts": {
+    "dev": "concurrently -n cms,web -c magenta,cyan \"npm:dev:cms\" \"npm:dev:frontend\"",
+    "dev:cms": "npm --prefix cms run develop",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix cms run build && npm --prefix frontend run build",
+    "build:cms": "npm --prefix cms run build",
+    "build:frontend": "npm --prefix frontend run build",
+    "start:cms": "npm --prefix cms run start",
+    "start:frontend": "npm --prefix frontend run start",
+    "install:all": "npm --prefix cms install && npm --prefix frontend install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

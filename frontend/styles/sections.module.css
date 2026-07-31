@@ -1,0 +1,368 @@
+/*
+ * Keyed page sections (the Section content type).
+ *
+ * These blocks came from the Saudi legacy site, whose CSS was written entirely
+ * in `vw` units against its own variables. Rather than carry that over, the
+ * sections are restyled with the consolidated design's conventions — 135px
+ * gutters, 36px section headings, #58595B body copy — so a Saudi-only section
+ * sits beside a shared one without looking transplanted.
+ */
+
+.section {
+  padding: 0 135px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.eyebrow {
+  color: #00b3a4;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: capitalize;
+  margin-bottom: 12px;
+}
+
+.title {
+  color: #02040e;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 140%;
+  text-transform: capitalize;
+  max-width: 800px;
+}
+
+.body {
+  color: #58595b;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 170%;
+}
+
+/* --- split: image beside copy (investment block, key factors) --- */
+
+.split {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+}
+
+.splitReverse {
+  flex-direction: row-reverse;
+}
+
+.splitImage {
+  flex: 1;
+  min-width: 0;
+}
+
+.splitImage img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.splitContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.splitContent .title {
+  text-align: left;
+  max-width: none;
+}
+
+.bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bullet {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  /* li is `cursor: pointer` globally for the nav; these are not clickable. */
+  cursor: default;
+}
+
+.bulletMark {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  margin-top: 4px;
+}
+
+/* --- stacked cards: image on top, copy below (benefits, vision, projects) --- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 60px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(247, 247, 248, 1);
+  height: 100%;
+}
+
+.cardImage {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.cardBody {
+  padding: 28px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardTitle {
+  color: #02040e;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 140%;
+}
+
+/* --- overlay cards: copy on top of the image (KSA city cards) --- */
+
+.overlayGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 60px;
+}
+
+.overlayCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  min-height: 420px;
+  padding: 32px 28px;
+  border-radius: 12px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.overlayCard img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+/* Without this the white copy sits on whatever the photo happens to be. */
+.overlayScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.25));
+  z-index: -1;
+}
+
+.overlayBadge {
+  width: 56px;
+  height: 56px;
+  border-radius: 56px;
+  background: #fff;
+  color: #11215b;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: auto;
+}
+
+.overlayCard .cardTitle,
+.overlayCard .body {
+  color: #fff;
+}
+
+.overlayCard .cardTitle {
+  color: #f5a623;
+}
+
+/* --- full-bleed banner --- */
+
+.banner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 20px;
+  padding: 120px 135px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.banner img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  z-index: -2;
+}
+
+.bannerScrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: -1;
+}
+
+.banner .title,
+.banner .body {
+  color: #fff;
+}
+
+.banner .body {
+  max-width: 900px;
+}
+
+/* --- hero --- */
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  min-height: 560px;
+  padding: 0 135px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+.heroScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.75),
+    rgba(0, 0, 0, 0.35)
+  );
+  z-index: -1;
+}
+
+/* Not .title — the hero heading is larger than a section heading. */
+.heroTitle {
+  color: #fff;
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 120%;
+}
+
+.heroBody {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
+  line-height: 170%;
+  max-width: 640px;
+}
+
+/* Gutters follow the site-wide breakpoint used for the footer and chat icon. */
+@media (min-width: 601px) and (max-width: 1280px) {
+  .section,
+  .hero,
+  .banner {
+    padding-left: 60px;
+    padding-right: 60px;
+  }
+
+  .split {
+    gap: 40px;
+  }
+}
+
+/*
+ * Columns drop later than the gutters do. Tying them to the 1280px gutter
+ * breakpoint put a 1265px laptop on two columns, which left the cards ~557px
+ * wide — nearly double the width the copy is set for.
+ */
+@media (max-width: 1024px) {
+  .grid,
+  .overlayGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .section,
+  .hero,
+  .banner {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .banner {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .heroTitle {
+    font-size: 34px;
+  }
+
+  .hero {
+    min-height: 420px;
+  }
+
+  .split {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .splitReverse {
+    flex-direction: column;
+  }
+
+  .grid,
+  .overlayGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 36px;
+  }
+
+  .overlayCard {
+    min-height: 340px;
+  }
+}

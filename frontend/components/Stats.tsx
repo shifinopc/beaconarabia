@@ -1,0 +1,107 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
+export interface StatItem {
+  label: string;
+  value: number;
+  suffix?: string;
+}
+
+/** Used only if the CMS has no stats for this region. */
+const FALLBACK_STATS: StatItem[] = [
+  { value: 1000, suffix: "+", label: "Happy Clients" },
+  { value: 50, suffix: "+", label: "Employees" },
+  { value: 4, suffix: "+", label: "Years of Experience" },
+  { value: 7, suffix: "", label: "Locations" },
+];
+
+const DURATION_MS = 1500;
+
+/**
+ * Animated stat counters.
+ *
+ * Ported from bg-Beacon/src/app/components/Stats.js. Rewritten in two ways:
+ *  - four duplicated useState counters and a setInterval per counter become one
+ *    requestAnimationFrame loop, so the numbers stay in sync and the animation
+ *    doesn't drift on slow frames
+ *  - the resize listener that swapped between two identical background image
+ *    URLs (largeBackgroundImageUrl === smallBackgroundImageUrl in the original)
+ *    is dropped; the padding it also computed now lives in CSS
+ *
+ * Respects prefers-reduced-motion by showing final values immediately.
+ */
+export default function Stats({
+  useBackgroundImage = true,
+  stats,
+}: {
+  useBackgroundImage?: boolean;
+  /** From the CMS; falls back to the original figures when empty. */
+  stats?: StatItem[];
+}) {
+  const items = stats?.length ? stats : FALLBACK_STATS;
+  const [counts, setCounts] = useState(() => items.map(() => 0));
+  const ref = useRef<HTMLDivElement>(null);
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      setCounts(items.map((s) => s.value));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting || hasRun.current) continue;
+          hasRun.current = true;
+
+          const start = performance.now();
+          const tick = (now: number) => {
+            const progress = Math.min((now - start) / DURATION_MS, 1);
+            // easeOutQuad
+            const eased = 1 - (1 - progress) * (1 - progress);
+            setCounts(items.map((s) => Math.round(s.value * eased)));
+            if (progress < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+
+          observer.unobserve(node);
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      className="greenBannerContiner"
+      ref={ref}
+      style={{
+        backgroundImage: useBackgroundImage ? "url(/NewSvgs/Backgrounds/bg4.webp)" : "none",
+        backgroundColor: useBackgroundImage ? "transparent" : "#024a04",
+      }}
+    >
+      <div className="statsContiner">
+        {items.map((stat, i) => (
+          <div className="statContainer" key={stat.label}>
+            {/* A figure, not a section heading — but it stays a heading element
+                because `.greenBannerContiner :is(h1..h6)` is what styles it. */}
+            <h2>
+              {counts[i]}
+              {stat.suffix}
+            </h2>
+            <p>{stat.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,154 @@
+.container {
+  height: 29.100529100529098vw;
+  background: #0c4108;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3.968253968253968vw;
+  padding: 3.968253968253968vw 9.920634920634921vw;
+  margin-top: -73px;
+}
+
+.leftContainer {
+  height: 21.164021164021165vw;
+  width: 22.288359788359788vw;
+}
+
+.leftContainer img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.rightContainer {
+  width: 52.38095238095239vw;
+  color: #fff;
+}
+
+.title {
+  font-size: 2.6455026455026456vw;
+  margin-bottom: 1.3227513227513228vw;
+}
+
+.description {
+  font-size: 1.0582010582010581vw;
+  margin-bottom: 2.1164021164021163vw;
+}
+
+.circulatingBorderButton img {
+  width: 1.5211640211640212vw !important;
+  height: 1.5211640211640212vw;
+}
+
+.circulatingBorderButton {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  padding: 1.3227513227513228vw 2.2486772486772484vw;
+  border-radius: 2.2486772486772484vw;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.3227513227513228vw;
+  cursor: pointer;
+  overflow: hidden;
+
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
+.circulatingBorderButton::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 2.2486772486772484vw;
+  border: 2px solid transparent;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.4)
+  );
+  background-size: 200% 200%;
+  animation: circulatingBorder 5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes circulatingBorder {
+  0% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 25% 25%;
+  }
+  75% {
+    background-position: 75% 75%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .container {
+    height: 157.6vw;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5.333333333333334vw;
+    padding: 10.666666666666668vw 6.4vw;
+    margin-top: -30px;
+  }
+
+  .leftContainer {
+    height: 70.39999999999999vw;
+    width: 74.4vw;
+  }
+
+  .leftContainer img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .rightContainer {
+    width: 87.2vw;
+    color: #fff;
+  }
+
+  .title {
+    font-size: 6.4vw;
+    margin-bottom: 2.1333333333333333vw;
+  }
+
+  .description {
+    font-size: 3.2vw;
+    margin-bottom: 5.333333333333334vw;
+  }
+
+  .circulatingBorderButton img {
+    width: 3.733333333333334vw !important;
+    height: 3.733333333333334vw;
+  }
+
+  .circulatingBorderButton {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    padding: 3.733333333333334vw 5.6000000000000005vw;
+    border-radius: 8.733333333333334vw;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.0666666666666667vw;
+    cursor: pointer;
+    overflow: hidden;
+
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+  }
+}
