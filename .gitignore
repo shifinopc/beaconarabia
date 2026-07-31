@@ -26,5 +26,6 @@ cms/public/uploads/*
 # are credential material as much as data — they belong in a backup location,
 # not in a shared repository. See DEPLOYMENT.md for how to regenerate both.
 deploy/*.zip
+deploy/*.tar.gz
 deploy/*.sql
 deploy/db-parts/
