@@ -5,6 +5,7 @@ import { SITE_URL } from "@/lib/regions";
 import { validateEnv } from "@/lib/env";
 import { loadSiteInfo } from "@/lib/site";
 import { organisationSchema, websiteSchema, jsonLdProps } from "@/lib/structured-data";
+import Analytics from "@/components/Analytics";
 
 // Runs once at module load, i.e. when the server boots — so a production
 // deployment missing STRAPI_URL or NEXT_PUBLIC_SITE_URL fails immediately and
@@ -56,6 +57,7 @@ export default async function RootLayout({
             articles) reference the organisation by @id rather than repeating
             it. */}
         <script {...jsonLdProps([organisationSchema(site), websiteSchema()])} />
+        <Analytics />
         {children}
       </body>
     </html>
