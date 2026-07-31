@@ -64,7 +64,24 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      /**
+       * Design assets in public/ — logos, hero art, icons, the ebook PDF.
+       *
+       * Next content-hashes everything it builds and caches that immutably,
+       * but files served straight out of public/ keep their original names, so
+       * an immutable long cache would pin a stale copy in every browser and CDN
+       * with no way to bust it short of renaming the file. An hour with
+       * must-revalidate keeps them cached without that trap.
+       */
+      {
+        source: "/:path*.(svg|png|jpg|jpeg|webp|gif|ico|pdf|woff|woff2)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=3600, must-revalidate" },
+        ],
+      },
+    ];
   },
   images: {
     // The legacy components all pass quality={100}; Next 16 requires each

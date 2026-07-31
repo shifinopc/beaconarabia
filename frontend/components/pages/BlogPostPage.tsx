@@ -11,6 +11,13 @@ import {
   postPath,
   sectionByKey,
 } from "@/lib/strapi";
+import { postDescription } from "@/lib/seo";
+import {
+  articleSchema,
+  breadcrumbSchema,
+  regionCrumbs,
+  jsonLdProps,
+} from "@/lib/structured-data";
 import PageShell from "../PageShell";
 import BlogContentBlock, { type ContentBlock } from "../BlogContentBlock";
 import BlogTeaser from "../BlogTeaser";
@@ -81,8 +88,24 @@ export default async function BlogPostPage({
     ? new Date(post.publishedAt).toLocaleDateString("en-US")
     : null;
 
+  // Same description the <meta> tag uses, so the two can't disagree — search
+  // engines treat a structured-data description that contradicts the page as a
+  // quality signal against it.
+  const description = postDescription(post);
+
   return (
     <PageShell region={region}>
+      <script
+        {...jsonLdProps([
+          articleSchema(post, description, cover),
+          breadcrumbSchema(
+            regionCrumbs(region, [
+              { name: "Blog", path: "/blog" },
+              { name: post.title, path: `/blog/${post.slug}` },
+            ]),
+          ),
+        ])}
+      />
       <div className={styles.bgContainer}>
         <div className={styles.topInnerContainer}>
           <div className={styles.leftContainer}>

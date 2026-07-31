@@ -12,6 +12,7 @@
     "build:frontend": "npm --prefix frontend run build",
     "start:cms": "npm --prefix cms run start",
     "start:frontend": "npm --prefix frontend run start",
+    "typecheck": "npm --prefix frontend run typecheck",
     "install:all": "npm --prefix cms install && npm --prefix frontend install"
   },
   "devDependencies": {

@@ -2,6 +2,14 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { sora } from "./fonts";
 import { SITE_URL } from "@/lib/regions";
+import { validateEnv } from "@/lib/env";
+import { loadSiteInfo } from "@/lib/site";
+import { organisationSchema, websiteSchema, jsonLdProps } from "@/lib/structured-data";
+
+// Runs once at module load, i.e. when the server boots — so a production
+// deployment missing STRAPI_URL or NEXT_PUBLIC_SITE_URL fails immediately and
+// visibly, rather than serving fallback content and localhost canonicals.
+validateEnv();
 
 export const metadata: Metadata = {
   // Unset on all three of the previous sites, which made Open Graph and
@@ -23,11 +31,15 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Contact details and social profiles come from the CMS, so the structured
+  // data describing the company can't drift from what the footer renders.
+  const site = await loadSiteInfo();
+
   return (
     <html lang="en" className={`${sora.variable} h-full antialiased`}>
       {/*
@@ -40,6 +52,10 @@ export default function RootLayout({
         suppressed at exactly the element affected.
       */}
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        {/* Site-wide identity, emitted once. Page-level schemas (breadcrumbs,
+            articles) reference the organisation by @id rather than repeating
+            it. */}
+        <script {...jsonLdProps([organisationSchema(site), websiteSchema()])} />
         {children}
       </body>
     </html>
