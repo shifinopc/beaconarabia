@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import type { Faq as FaqEntry } from "@/lib/strapi";
+import { faqSchema, jsonLdProps } from "@/lib/structured-data";
 
 /**
  * Ported from bg-Beacon/src/app/components/Faq.js.
@@ -24,8 +25,16 @@ export default function Faq({
 
   if (!entries.length) return null;
 
+  /**
+   * Emitted from the component rather than each page so every route that shows
+   * FAQs is covered automatically and the markup cannot drift from the entries
+   * actually rendered below.
+   */
+  const schema = faqSchema(entries);
+
   return (
     <div className="faqMainContainer">
+      {schema && <script {...jsonLdProps(schema)} />}
       <div className="faqContainer">
         <div className="faqLeft">
           <div className="businessContentContainer">

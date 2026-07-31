@@ -1,0 +1,70 @@
+{
+  "kind": "collectionType",
+  "collectionName": "enquiries",
+  "info": {
+    "singularName": "enquiry",
+    "pluralName": "enquiries",
+    "displayName": "Enquiry",
+    "description": "Submissions from the website's contact, newsletter and enquiry-popup forms. Stored here first; the notification email is a side effect, so an enquiry survives a mail failure."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "kind": {
+      "type": "enumeration",
+      "enum": ["contact", "newsletter", "popup"],
+      "default": "contact",
+      "required": true,
+      "description": "Which form this came from."
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "maxLength": 60
+    },
+    "subject": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "message": {
+      "type": "text",
+      "maxLength": 5000
+    },
+    "region": {
+      "type": "enumeration",
+      "enum": ["global", "ae", "sa"],
+      "default": "global",
+      "description": "Which regional site the enquiry came from — the whole point of the consolidated setup is that this is still distinguishable."
+    },
+    "enquiryType": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Set by forms that need to be told apart within a kind, e.g. the partners page posting \"Become a partner\"."
+    },
+    "sourcePath": {
+      "type": "string",
+      "maxLength": 300,
+      "description": "Page the form was submitted from."
+    },
+    "ipAddress": {
+      "type": "string",
+      "maxLength": 60,
+      "private": true,
+      "description": "Kept for abuse investigation. `private` so it never appears in an API response."
+    },
+    "viewed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Set automatically the first time the entry is opened in the admin."
+    }
+  }
+}

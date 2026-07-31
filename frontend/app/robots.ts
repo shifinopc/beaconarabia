@@ -6,10 +6,37 @@ import { SITE_URL } from "@/lib/regions";
  * identical across all three sites, and — like the sitemaps — never actually
  * served because they lived in src/app/ rather than public/.
  */
+/**
+ * Paths with nothing crawlable behind them. Blocking here saves crawl budget
+ * that would otherwise be spent fetching pages only to find no content.
+ */
+const NO_CRAWL = [
+  "/api/", // Server-only routes: form submission and revalidation.
+  "/_next/", // Build output and framework internals.
+];
+
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: "*", allow: "/" }],
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: NO_CRAWL,
+      },
+    ],
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,
   };
+
+  /*
+   * AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot) are
+   * deliberately not listed, which leaves them under the `*` rule above — free
+   * to crawl, exactly as today.
+   *
+   * Whether that is right is a business decision rather than a technical one:
+   * blocking keeps this content out of AI training and assistant answers,
+   * allowing it means Beacon can be cited when someone asks an assistant about
+   * GCC company formation. Add explicit per-agent rules once that call is made,
+   * rather than letting the default stand by accident.
+   */
 }

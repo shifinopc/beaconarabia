@@ -30,6 +30,43 @@ export const metadata: Metadata = {
     "company formation saudi arabia",
     "business consultants GCC",
   ],
+  /**
+   * Site-wide social card.
+   *
+   * Until now only blog posts carried any Open Graph data, so every share of
+   * the homepage or a service page rendered as a bare text link — the legacy
+   * site had a share image and it was lost in the migration. Declaring these on
+   * the root layout means every route inherits them, and any page that sets its
+   * own openGraph block (articles do) overrides rather than merges.
+   *
+   * The image path is relative on purpose: metadataBase above resolves it to an
+   * absolute URL, which is what crawlers require and what the previous sites got
+   * wrong by leaving metadataBase unset.
+   */
+  openGraph: {
+    type: "website",
+    siteName: "Beacon",
+    locale: "en",
+    title: "Beacon — Your Global Advisory Partner For Business Growth",
+    description:
+      "Business incorporation, consultation, accounting, audit and technology services across the GCC.",
+    url: SITE_URL,
+    images: [
+      {
+        url: "/og-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Beacon — your global advisory partner for business growth",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Beacon — Your Global Advisory Partner For Business Growth",
+    description:
+      "Business incorporation, consultation, accounting, audit and technology services across the GCC.",
+    images: ["/og-default.png"],
+  },
 };
 
 export default async function RootLayout({

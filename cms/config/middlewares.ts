@@ -55,11 +55,16 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Middlewar
       origin: env.array('CORS_ORIGINS', ['http://localhost:3000', 'http://localhost:1337']),
     },
   },
+  'strapi::poweredBy',
+  'strapi::query',
+  'strapi::body',
   /**
-   * Placed before the body parser so a flood is rejected without Strapi
-   * spending work parsing it. Counts anonymous /api traffic and, far more
-   * strictly, attempts against the admin login — see src/middlewares/
-   * rate-limit.ts for why authenticated requests are exempt.
+   * Counts anonymous /api traffic and, far more strictly, attempts against the
+   * admin login — see src/middlewares/rate-limit.ts for why authenticated
+   * requests are exempt.
+   *
+   * Sits after `strapi::body` so a request is fully parsed before being
+   * counted; ordering it earlier saves nothing worth the surprise.
    */
   {
     name: 'global::rate-limit',
@@ -70,9 +75,6 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Middlewar
       authWindowMs: env.int('RATE_LIMIT_AUTH_WINDOW_MS', 300_000),
     },
   },
-  'strapi::poweredBy',
-  'strapi::query',
-  'strapi::body',
   'strapi::session',
   'strapi::favicon',
   'strapi::public',

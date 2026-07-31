@@ -114,6 +114,37 @@ export function regionCrumbs(region: Region, trail: Crumb[] = []): Crumb[] {
   ];
 }
 
+/**
+ * FAQ rich results.
+ *
+ * The FAQs are already on the page in an accordion; this states the
+ * question/answer pairing explicitly so Google can expand the listing rather
+ * than inferring structure from markup. Worth having because the answers are
+ * substantial and the queries they match are exactly the ones this business
+ * competes for.
+ *
+ * Google requires the marked-up content to be visible on the page and the
+ * answers to be complete — both true of the accordion, which hides answers
+ * behind a toggle rather than omitting them.
+ */
+export function faqSchema(entries: { question: string; answer: string }[]): JsonLd | null {
+  const usable = entries.filter((e) => e.question?.trim() && e.answer?.trim());
+  if (!usable.length) return null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: usable.map((entry) => ({
+      "@type": "Question",
+      name: entry.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: entry.answer,
+      },
+    })),
+  };
+}
+
 export function articleSchema(post: Post, description: string, imageUrl?: string | null): JsonLd {
   return {
     "@context": "https://schema.org",

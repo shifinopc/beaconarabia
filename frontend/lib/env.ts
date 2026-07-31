@@ -35,18 +35,17 @@ const REQUIRED_IN_PRODUCTION = [
  */
 const RECOMMENDED = [
   "REVALIDATE_SECRET",
-  "EMAILJS_SERVICE_ID",
-  "EMAILJS_TEMPLATE_ID",
-  "EMAILJS_PUBLIC_KEY",
-  "EMAILJS_PRIVATE_KEY",
+  /**
+   * Creating enquiries needs its own token — the read-only one cannot write.
+   * Without it forms return 503 rather than losing submissions silently.
+   * Mail delivery is no longer configured here at all: SMTP settings live in
+   * the CMS's Email Settings single type.
+   */
+  "STRAPI_WRITE_TOKEN",
 ] as const;
 
 /** Old names still honoured, so a pre-rename environment isn't reported as broken. */
-const ALIASES: Record<string, string[]> = {
-  EMAILJS_SERVICE_ID: ["NEXT_PUBLIC_EMAILJS_SERVICE_ID"],
-  EMAILJS_TEMPLATE_ID: ["NEXT_PUBLIC_EMAILJS_TEMPLATE_ID"],
-  EMAILJS_PUBLIC_KEY: ["NEXT_PUBLIC_EMAILJS_PUBLIC_KEY"],
-};
+const ALIASES: Record<string, string[]> = {};
 
 function isSet(name: string): boolean {
   if (process.env[name]) return true;

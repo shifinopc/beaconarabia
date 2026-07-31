@@ -517,6 +517,115 @@ export interface ApiClientClient extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiEmailSettingEmailSetting extends Struct.SingleTypeSchema {
+  collectionName: 'email_settings';
+  info: {
+    description: 'SMTP details and recipients for website form notifications. Admin-only \u2014 never exposed publicly.';
+    displayName: 'Email Settings';
+    pluralName: 'email-settings';
+    singularName: 'email-setting';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    autoReply: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    enabled: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    fromEmail: Schema.Attribute.String;
+    fromName: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Beacon Website'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::email-setting.email-setting'
+    > &
+      Schema.Attribute.Private;
+    notifyContact: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    notifyNewsletter: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    notifyPopup: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    publishedAt: Schema.Attribute.DateTime;
+    recipientEmail: Schema.Attribute.String;
+    smtpHost: Schema.Attribute.String;
+    smtpPassword: Schema.Attribute.String & Schema.Attribute.Private;
+    smtpPort: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<587>;
+    smtpSecure: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    smtpUsername: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiEnquiryEnquiry extends Struct.CollectionTypeSchema {
+  collectionName: 'enquiries';
+  info: {
+    description: "Submissions from the website's contact, newsletter and enquiry-popup forms. Stored here first; the notification email is a side effect, so an enquiry survives a mail failure.";
+    displayName: 'Enquiry';
+    pluralName: 'enquiries';
+    singularName: 'enquiry';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    enquiryType: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    ipAddress: Schema.Attribute.String &
+      Schema.Attribute.Private &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    kind: Schema.Attribute.Enumeration<['contact', 'newsletter', 'popup']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'contact'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::enquiry.enquiry'
+    > &
+      Schema.Attribute.Private;
+    message: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 5000;
+      }>;
+    name: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    region: Schema.Attribute.Enumeration<['global', 'ae', 'sa']> &
+      Schema.Attribute.DefaultTo<'global'>;
+    sourcePath: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    subject: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    viewed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+  };
+}
+
 export interface ApiFaqFaq extends Struct.CollectionTypeSchema {
   collectionName: 'faqs';
   info: {
@@ -1457,6 +1566,8 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::career-highlight.career-highlight': ApiCareerHighlightCareerHighlight;
       'api::client.client': ApiClientClient;
+      'api::email-setting.email-setting': ApiEmailSettingEmailSetting;
+      'api::enquiry.enquiry': ApiEnquiryEnquiry;
       'api::faq.faq': ApiFaqFaq;
       'api::homepage.homepage': ApiHomepageHomepage;
       'api::job.job': ApiJobJob;

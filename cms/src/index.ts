@@ -107,15 +107,24 @@ async function ensurePublicReadAccess(strapi: Core.Strapi) {
  * production the token belongs in whatever secret store the host uses, not in
  * a file this process can reach.
  */
-async function ensureApiToken(strapi: Core.Strapi) {
-  const TOKEN_NAME = 'Frontend (read-only)';
+interface TokenSpec {
+  name: string;
+  description: string;
+  /** Env var the frontend reads this token from. */
+  envVar: string;
+  /** `read-only` for reads; `custom` narrows to the listed permissions. */
+  type: 'read-only' | 'custom';
+  /** Required for `custom`, e.g. ['api::enquiry.enquiry.create']. */
+  permissions?: string[];
+}
 
+async function provisionToken(strapi: Core.Strapi, spec: TokenSpec) {
   const existing = await strapi.db
     .query('admin::api-token')
-    .findOne({ where: { name: TOKEN_NAME } });
+    .findOne({ where: { name: spec.name } });
 
   if (existing) {
-    strapi.log.info(`[bootstrap] API token "${TOKEN_NAME}" already exists`);
+    strapi.log.info(`[bootstrap] API token "${spec.name}" already exists`);
     return;
   }
 
@@ -126,24 +135,27 @@ async function ensureApiToken(strapi: Core.Strapi) {
   let created: { accessKey: string };
   try {
     created = await apiTokenService.create({
-      name: TOKEN_NAME,
-      description: 'Read-only access for the Next.js frontend (auto-provisioned).',
-      type: 'read-only',
+      name: spec.name,
+      description: spec.description,
+      type: spec.type,
       kind: 'content-api',
       lifespan: null,
+      ...(spec.permissions ? { permissions: spec.permissions } : {}),
     });
   } catch (error) {
     strapi.log.warn(
-      `[bootstrap] could not create API token: ${error instanceof Error ? error.message : error}`,
+      `[bootstrap] could not create API token "${spec.name}": ${
+        error instanceof Error ? error.message : error
+      }`,
     );
     return;
   }
 
-  strapi.log.info(`[bootstrap] created API token "${TOKEN_NAME}"`);
+  strapi.log.info(`[bootstrap] created API token "${spec.name}"`);
 
   if (process.env.NODE_ENV === 'production') {
     strapi.log.warn(
-      `[bootstrap] STRAPI_API_TOKEN=${created.accessKey} — save this now, it will not be shown again. ` +
+      `[bootstrap] ${spec.envVar}=${created.accessKey} — save this now, it will not be shown again. ` +
         'Not writing it to .env.local in production; put it in your host’s secret store.',
     );
     return;
@@ -152,21 +164,49 @@ async function ensureApiToken(strapi: Core.Strapi) {
   const envPath = path.join(__dirname, '..', '..', '..', 'frontend', '.env.local');
   try {
     const env = fs.readFileSync(envPath, 'utf8');
-    const line = `STRAPI_API_TOKEN=${created.accessKey}`;
-    const updated = /^STRAPI_API_TOKEN=.*$/m.test(env)
-      ? env.replace(/^STRAPI_API_TOKEN=.*$/m, line)
+    const line = `${spec.envVar}=${created.accessKey}`;
+    const pattern = new RegExp(`^${spec.envVar}=.*$`, 'm');
+    const updated = pattern.test(env)
+      ? env.replace(pattern, line)
       : `${env.trimEnd()}\n${line}\n`;
     fs.writeFileSync(envPath, updated);
     strapi.log.info(
-      '[bootstrap] wrote the token to frontend/.env.local — restart the Next.js dev server to pick it up',
+      `[bootstrap] wrote ${spec.envVar} to frontend/.env.local — restart the Next.js dev server to pick it up`,
     );
   } catch (error) {
     strapi.log.warn(
-      `[bootstrap] created the token but could not write frontend/.env.local: ${
+      `[bootstrap] created "${spec.name}" but could not write frontend/.env.local: ${
         error instanceof Error ? error.message : error
-      }. STRAPI_API_TOKEN=${created.accessKey}`,
+      }. ${spec.envVar}=${created.accessKey}`,
     );
   }
+}
+
+async function ensureApiToken(strapi: Core.Strapi) {
+  await provisionToken(strapi, {
+    name: 'Frontend (read-only)',
+    description: 'Read-only access for the Next.js frontend (auto-provisioned).',
+    envVar: 'STRAPI_API_TOKEN',
+    type: 'read-only',
+  });
+
+  /**
+   * A second, deliberately tiny token that can create enquiries and nothing
+   * else.
+   *
+   * The alternative — granting the public role create access, as the sibling
+   * project does — would let anyone POST straight to Strapi and skip the
+   * honeypot, rate limit and Turnstile check that the frontend's /api/contact
+   * applies. Requiring a token that only ever lives on the Next server keeps
+   * those checks on the only path in.
+   */
+  await provisionToken(strapi, {
+    name: 'Frontend (submissions)',
+    description: 'Creates enquiries from the website forms. No read access.',
+    envVar: 'STRAPI_WRITE_TOKEN',
+    type: 'custom',
+    permissions: ['api::enquiry.enquiry.create'],
+  });
 }
 
 /**

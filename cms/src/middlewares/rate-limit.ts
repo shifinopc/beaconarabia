@@ -31,6 +31,16 @@ interface Config {
   /** Requests allowed per window for authentication endpoints. */
   authMax?: number;
   authWindowMs?: number;
+  /**
+   * Names a route-scoped bucket, e.g. `enquiry-create`.
+   *
+   * Its presence also changes the policy: a route that opts in is counted for
+   * every caller, authenticated or not. The blanket exemption below exists so
+   * the Next server's read traffic — all of it from one IP under one token —
+   * isn't throttled, but that reasoning does not extend to writes, where the
+   * token holder is exactly who needs a ceiling.
+   */
+  bucket?: string;
 }
 
 /** Paths where a failed attempt is a guess at a credential. */
@@ -62,13 +72,16 @@ export default (config: Config | null) => {
   const windowMs = config?.windowMs ?? 60_000;
   const authMax = config?.authMax ?? 10;
   const authWindowMs = config?.authWindowMs ?? 300_000;
+  const routeBucket = config?.bucket;
 
   return async (ctx: any, next: () => Promise<unknown>) => {
     const path: string = ctx.request?.path ?? '';
     const isAuthEndpoint = AUTH_PATHS.some((p) => path.startsWith(p));
 
-    // Our own server, authenticated with the read-only token: never throttled.
-    if (!isAuthEndpoint) {
+    // Route-scoped use (a `bucket` was configured): everyone is counted, so
+    // skip the exemptions entirely.
+    if (!routeBucket && !isAuthEndpoint) {
+      // Our own server, authenticated with the read-only token: never throttled.
       if (ctx.request?.header?.authorization) return next();
       if (!path.startsWith('/api/')) return next();
     }

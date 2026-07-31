@@ -1,0 +1,78 @@
+{
+  "kind": "singleType",
+  "collectionName": "email_settings",
+  "info": {
+    "singularName": "email-setting",
+    "pluralName": "email-settings",
+    "displayName": "Email Settings",
+    "description": "SMTP details and recipients for website form notifications. Admin-only — never exposed publicly."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "enabled": {
+      "type": "boolean",
+      "default": false,
+      "required": true,
+      "description": "Master switch. With this off no email is sent, but enquiries are still saved — so turning it off loses notifications, never submissions."
+    },
+    "smtpHost": {
+      "type": "string",
+      "description": "SMTP server, e.g. smtp.zoho.com, smtp.gmail.com, or your hosting provider's mail server."
+    },
+    "smtpPort": {
+      "type": "integer",
+      "default": 587,
+      "description": "587 for STARTTLS, 465 for implicit SSL."
+    },
+    "smtpSecure": {
+      "type": "boolean",
+      "default": false,
+      "description": "On for port 465, off for 587. Getting this wrong is the usual cause of a connection that hangs rather than errors."
+    },
+    "smtpUsername": {
+      "type": "string",
+      "description": "SMTP login, usually the full mailbox address."
+    },
+    "smtpPassword": {
+      "type": "string",
+      "private": true,
+      "description": "SMTP password or app password. Deliberately a string, not Strapi's `password` type: that one bcrypt-hashes the value, which makes it useless for authenticating to a mail server. `private` keeps it out of API responses."
+    },
+    "fromName": {
+      "type": "string",
+      "default": "Beacon Website",
+      "description": "Display name on outgoing notifications."
+    },
+    "fromEmail": {
+      "type": "string",
+      "description": "From address. Must be one the SMTP account is permitted to send as, or the provider will reject the message."
+    },
+    "recipientEmail": {
+      "type": "string",
+      "description": "Where notifications are delivered. Comma-separate for several."
+    },
+    "notifyContact": {
+      "type": "boolean",
+      "default": true,
+      "description": "Email on new contact-form enquiries."
+    },
+    "notifyNewsletter": {
+      "type": "boolean",
+      "default": true,
+      "description": "Email on new newsletter signups."
+    },
+    "notifyPopup": {
+      "type": "boolean",
+      "default": true,
+      "description": "Email on new enquiry-popup submissions."
+    },
+    "autoReply": {
+      "type": "boolean",
+      "default": true,
+      "description": "Send an acknowledgement back to whoever submitted the form."
+    }
+  }
+}

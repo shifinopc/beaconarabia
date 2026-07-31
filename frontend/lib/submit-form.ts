@@ -27,6 +27,16 @@ export interface SubmitPayload {
   turnstileToken?: string;
 }
 
+/**
+ * The page the form was submitted from, recorded against the enquiry so a
+ * submission can be traced back to its context — which of several pages
+ * embedding the same form actually produced it.
+ */
+function currentPath(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return window.location.pathname;
+}
+
 export interface SubmitResult {
   ok: boolean;
   /** Server-supplied message, safe to show the user. */
@@ -38,7 +48,7 @@ export async function submitForm(payload: SubmitPayload): Promise<SubmitResult> 
     const res = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ sourcePath: currentPath(), ...payload }),
     });
 
     if (res.ok) return { ok: true };
