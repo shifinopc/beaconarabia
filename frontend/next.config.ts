@@ -105,6 +105,31 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    /**
+     * Image optimization is off, and this is the single most important line in
+     * this file for keeping the site up.
+     *
+     * Every `<Image>` without `unoptimized` becomes a `/_next/image` request
+     * that runs sharp/libvips in the server process, each with its own thread
+     * pool. The homepage alone issued 42 of them, so one visitor meant 42
+     * concurrent optimizations. On this shared host that exhausted the account's
+     * thread limit — `pthread_create: Resource temporarily unavailable`,
+     * `fork: retry` even in an SSH shell — and took both apps down repeatedly.
+     * The hosting team independently identified this app as the source.
+     *
+     * Almost nothing is given up, because the images are already optimized at
+     * rest: the CMS media pipeline (cms/src/optimise-media.ts) re-encodes
+     * anything over 250 KB to WebP at a maximum of 1600px, so the optimizer was
+     * mostly re-processing WebP files into WebP. What is lost is per-breakpoint
+     * resizing, which costs some bytes on small screens — a fair trade against
+     * an outage, and recoverable later via Cloudflare's own image resizing,
+     * which runs at the edge rather than in this process.
+     *
+     * `remotePatterns` below is now unused but kept: it costs nothing and is
+     * required the moment this is turned back on.
+     */
+    unoptimized: true,
+
     // The legacy components all pass quality={100}; Next 16 requires each
     // quality value used to be declared here.
     qualities: [75, 100],
