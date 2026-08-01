@@ -3,8 +3,9 @@ import PartnersPage from "@/components/pages/PartnersPage";
 import { REGIONS, alternatesFor } from "@/lib/regions";
 
 export const metadata: Metadata = {
-  title: "Partners",
-  description: "Partner with Beacon and grow your business across the GCC.",
+  title: "Partner With Beacon — Grow Across the GCC",
+  description:
+    "Partner with Beacon to serve clients across the UAE and Saudi Arabia. Referral and collaboration opportunities for advisors, agencies and professional firms.",
   alternates: alternatesFor(REGIONS.global, "partners"),
 };
 
