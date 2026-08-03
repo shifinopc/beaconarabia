@@ -64,7 +64,18 @@ export default function Faq({
                       <h3>{entry.question}</h3>
                     </div>
                     <div className={`faqAddIcon ${isOpen ? "rotateIcon" : ""}`}>
-                      <button type="button" aria-expanded={isOpen}>
+                      {/* The icon is decorative (alt=""), so without an
+                          aria-label this button has no accessible name at all —
+                          screen readers and AI agents announce it as an
+                          unlabelled control and cannot tell which question it
+                          belongs to. Naming it with the question also gives the
+                          five buttons on a page distinct names rather than five
+                          identical "Expand" controls. */}
+                      <button
+                        type="button"
+                        aria-expanded={isOpen}
+                        aria-label={`${isOpen ? "Collapse" : "Expand"} answer: ${entry.question}`}
+                      >
                         <Image src="/+.svg" width={16} height={16} alt="" />
                       </button>
                     </div>

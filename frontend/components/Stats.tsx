@@ -29,7 +29,7 @@ const DURATION_MS = 1500;
  *    URLs (largeBackgroundImageUrl === smallBackgroundImageUrl in the original)
  *    is dropped; the padding it also computed now lives in CSS
  *
- * Respects prefers-reduced-motion by showing final values immediately.
+ * Respects prefers-reduced-motion by leaving the final values in place.
  */
 export default function Stats({
   useBackgroundImage = true,
@@ -40,7 +40,17 @@ export default function Stats({
   stats?: StatItem[];
 }) {
   const items = stats?.length ? stats : FALLBACK_STATS;
-  const [counts, setCounts] = useState(() => items.map(() => 0));
+
+  /**
+   * Seeded with the real figures, not zero.
+   *
+   * Starting at zero meant the server rendered `<h2>0</h2>` and only a browser
+   * running JavaScript ever saw the true number — so every crawler, AI model and
+   * quality rater reading the HTML was told this company has 0 employees and 0
+   * years of experience. The animation is a flourish; the figures are the
+   * content, and the content has to exist without JavaScript.
+   */
+  const [counts, setCounts] = useState(() => items.map((s) => s.value));
   const ref = useRef<HTMLDivElement>(null);
   const hasRun = useRef(false);
 
@@ -48,11 +58,20 @@ export default function Stats({
     const node = ref.current;
     if (!node) return;
 
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) {
-      setCounts(items.map((s) => s.value));
-      return;
-    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    /**
+     * Skip the animation entirely when the banner is already on screen at load.
+     *
+     * Counting up requires starting from zero, and doing that to something the
+     * visitor is already looking at would flash the real numbers away and count
+     * them back — worse than no animation. Animating only on scroll-in means
+     * the reset happens off-screen, where nobody sees it.
+     */
+    const rect = node.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) return;
+
+    setCounts(items.map(() => 0));
 
     const observer = new IntersectionObserver(
       (entries) => {

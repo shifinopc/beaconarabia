@@ -30,7 +30,48 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
  * provides nothing. The headers below are unambiguous wins that need no
  * per-origin research.
  */
+/**
+ * Content-Security-Policy.
+ *
+ * Built from an audit of what the live pages actually request, not from a
+ * template: the CMS media host, Google Analytics, Cloudflare's analytics beacon,
+ * and nothing else. Anything an injected script would want to reach — an
+ * attacker's own domain, an arbitrary endpoint to exfiltrate a form submission
+ * to — is not on this list, which is the point.
+ *
+ * `'unsafe-inline'` is present for both scripts and styles, and is load-bearing
+ * rather than laziness:
+ *   - Next inlines its hydration bootstrap as a `<script>` with no nonce
+ *     available to a statically exported page.
+ *   - The ported legacy design uses 75 inline `style=` attributes on the
+ *     homepage alone; removing them is a rewrite of the whole stylesheet.
+ * A nonce-based policy needs per-request rendering, which would undo the
+ * prerendering that keeps this site fast and, on this host, up at all.
+ *
+ * So this is a meaningful reduction in what an injected script can do, not the
+ * strictest possible policy. `object-src 'none'` and `frame-ancestors 'self'`
+ * are absolute, and both close real attack classes.
+ */
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com",
+  "style-src 'self' 'unsafe-inline'",
+  // The CMS serves every content image; data:/blob: cover inlined SVGs.
+  "img-src 'self' data: blob: https://cms.beaconarabia.com https://www.googletagmanager.com",
+  "font-src 'self' data:",
+  // GA and Cloudflare analytics beacons, plus the CMS for form submission.
+  "connect-src 'self' https://cms.beaconarabia.com https://www.google-analytics.com https://static.cloudflareinsights.com",
+  // Nothing is embedded, and nothing should be able to embed this site.
+  "frame-src 'none'",
+  "frame-ancestors 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  // Forms post to our own API route only.
+  "form-action 'self'",
+].join("; ");
+
 const securityHeaders = [
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
   // Two years, matching the preload-list requirement. Safe here because both
   // beaconarabia.com and cms.beaconarabia.com are HTTPS-only behind Cloudflare
   // — if any subdomain ever needs plain HTTP, drop includeSubDomains first.
@@ -83,6 +124,50 @@ const nextConfig: NextConfig = {
   // Drops the `X-Powered-By: Next.js` header — a free version fingerprint that
   // tells an attacker which framework CVEs to try.
   poweredByHeader: false,
+
+  /**
+   * Canonicalise the host, and rescue the legacy URLs.
+   *
+   * Both www and apex currently answer 200 with no redirect between them, while
+   * every canonical tag names the apex — so the two hostnames compete for the
+   * same content and split whatever link equity the site earns.
+   *
+   * The /pages/* paths are the old sites' URL scheme. They 404 today, but
+   * Google still has them indexed, so real visitors and real backlink equity
+   * are landing on dead ends. 301 rather than 302 because these moves are
+   * permanent and we want the equity to transfer.
+   *
+   * The old regional subdomains (ksa./uae.beaconarabia.com) cannot be handled
+   * here — they no longer resolve, so nothing of ours ever sees the request.
+   * They need a DNS record plus a redirect rule at Cloudflare.
+   */
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.beaconarabia.com" }],
+        destination: "https://beaconarabia.com/:path*",
+        permanent: true,
+      },
+
+      // Global site.
+      { source: "/pages/About", destination: "/about", permanent: true },
+      { source: "/pages/Services", destination: "/services", permanent: true },
+      { source: "/pages/Contact", destination: "/contact", permanent: true },
+      { source: "/pages/Careers", destination: "/careers", permanent: true },
+      { source: "/pages/Partners", destination: "/partners", permanent: true },
+      { source: "/pages/blog", destination: "/blog", permanent: true },
+
+      // The two regional landing pages, which only ever existed on their own
+      // regional site and now live under a region segment.
+      { source: "/pages/WhyDubai", destination: "/ae/why-dubai", permanent: true },
+      { source: "/pages/WhySaudi", destination: "/sa/why-saudi", permanent: true },
+
+      // Anything else under the old scheme is better sent to the homepage than
+      // left as a 404 — a soft landing keeps the visitor and passes some equity.
+      { source: "/pages/:path*", destination: "/", permanent: true },
+    ];
+  },
 
   async headers() {
     return [
