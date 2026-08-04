@@ -1,10 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import animationData from "@/public/circleGlobal.json";
-
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 const WORDS = ["Growth", "Success", "Strategy", "Expansion"];
 const WORD_INTERVAL_MS = 450;
@@ -25,6 +21,13 @@ const DISMISS_AFTER_MS = 600;
  *
  * The page content is server-rendered underneath, so crawlers still see it —
  * the overlay only covers it visually.
+ *
+ * The spinner is CSS, not Lottie. `lottie-react` plus its animation data was a
+ * 307 KB client chunk — the largest single thing the site shipped — to render a
+ * decorative ring for 600ms. On a throttled mobile connection that competed for
+ * bandwidth with the CSS and hero image that LCP actually depends on. The
+ * replacement is a bordered circle rotated by a keyframe: visually equivalent at
+ * 50px, and free.
  */
 export default function IntroLoader() {
   const [dismissed, setDismissed] = useState(false);
@@ -52,10 +55,10 @@ export default function IntroLoader() {
       style={dismissed ? { pointerEvents: "none" } : undefined}
     >
       <div className="DesktopLottieContainer">
-        <Lottie animationData={animationData} loop style={{ width: 50, height: 50 }} />
+        <span className="introSpinner" />
       </div>
       <div className="MobileLottieContainer">
-        <Lottie animationData={animationData} loop style={{ width: 25, height: 25 }} />
+        <span className="introSpinner" />
       </div>
 
       <div className="changeTextContainer">

@@ -3426,6 +3426,42 @@ option {
 }
 
 /*
+ * Intro spinner — the CSS replacement for the Lottie ring.
+ *
+ * The original pulled in lottie-react and its animation JSON as a 307 KB client
+ * chunk to draw a rotating green circle for 600ms. Colours are taken from the
+ * animation it replaces (#13670b on a faded track), and the sizes match the
+ * 50px desktop / 25px mobile the Lottie instances were given inline.
+ */
+.introSpinner {
+  display: block;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid rgba(19, 103, 11, 0.15);
+  border-top-color: #13670b;
+  animation: intro-spin 0.9s linear infinite;
+}
+
+.MobileLottieContainer .introSpinner {
+  width: 25px;
+  height: 25px;
+  border-width: 2px;
+}
+
+@keyframes intro-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .introSpinner {
+    animation: none;
+  }
+}
+
+/*
  * Someone who asked for less motion still needs the overlay gone — more
  * urgently, if anything. Collapse it without the animation.
  */
