@@ -61,18 +61,27 @@ export default function Stats({
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     /**
-     * Skip the animation entirely when the banner is already on screen at load.
-     *
-     * Counting up requires starting from zero, and doing that to something the
-     * visitor is already looking at would flash the real numbers away and count
-     * them back — worse than no animation. Animating only on scroll-in means
-     * the reset happens off-screen, where nobody sees it.
+     * Skip the animation entirely when the banner is already on screen at load,
+     * so the visitor never sees the real numbers flash away and count back.
      */
     const rect = node.getBoundingClientRect();
     if (rect.top < window.innerHeight && rect.bottom > 0) return;
 
-    setCounts(items.map(() => 0));
-
+    /**
+     * Zeroing happens inside the observer, not here.
+     *
+     * Setting counts to 0 up-front fixed the server-rendered HTML but not the
+     * rendered DOM: for a banner below the fold, hydration replaced the real
+     * figures with 0 and left them there until someone scrolled. A crawler that
+     * executes JavaScript — Googlebot, Lighthouse, an AI agent — renders the
+     * page, never scrolls, and reads "0 Employees, 0 Years of Experience". An
+     * external audit caught exactly that after the previous fix shipped.
+     *
+     * Deferring the reset until the element actually enters the viewport means
+     * the DOM holds the true values for anything that does not scroll, and the
+     * count-up still plays for anyone who does. The first animation frame
+     * supplies the zero, so no separate reset is needed at all.
+     */
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
