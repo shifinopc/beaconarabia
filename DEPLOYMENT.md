@@ -156,12 +156,28 @@ On the server:
 
 ```bash
 cd ~/frontend
+rm -rf .next.old                          # see below — without this, mv fails
 mv .next .next.old                        # rule 3
 tar -xzf beacon-next-build.tar.gz
 chmod -R u+rwX,go+rX .next public         # rule 2
 find .next -type d ! -perm -u+x | wc -l   # must print 0
 ls .next/prerender-manifest.json && touch tmp/restart.txt
 ```
+
+**Clear `.next.old` first.** If it survives from the previous deploy, `mv .next
+.next.old` does not replace it — it moves `.next` *inside* it, and fails with
+`cannot move '.next' to '.next.old/.next': Directory not empty`. Because the
+steps are chained with `&&`, everything after that is skipped: no extract, no
+restart, no error page. The old build keeps serving and the deploy looks like it
+happened. This has already cost one silent no-op deploy.
+
+Deleting it is safe — it is only the rollback copy of the *previous* build, and
+the currently-live `.next` becomes the new rollback a moment later.
+
+Verify with `grep -o`, never `grep -c`: Next emits the whole document on one
+line, so `grep -c` reports `1` for any pattern that appears at all, including
+zero-vs-many differences. `curl -s https://beaconarabia.com/ | grep -o 'as="image"' | wc -l`
+is the correct shape.
 
 `prerender-manifest.json` is the real completion marker. `BUILD_ID` is written
 *before* static generation, so its presence means nothing — a build that died
