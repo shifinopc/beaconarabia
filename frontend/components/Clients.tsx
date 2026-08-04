@@ -66,12 +66,25 @@ export default function Clients({
           ref={scrollerRef}
         >
           <div className="scroller__inner">
+            {/*
+              loading="lazy" is load-bearing, not a micro-optimisation.
+
+              React treats an eager <img> rendered this early as worth
+              preloading, and emits <link rel="preload" as="image"> for each one
+              into <head>. With ~20 logos that meant ~20 preloads and roughly
+              800 KB fetched at high priority — ahead of the 80 KB of
+              render-blocking CSS and competing with the 14 KB hero image that
+              is the actual LCP element on mobile. The logos sit far below the
+              fold and are not worth a single byte of the critical path.
+            */}
             {logos.map((src, i) => (
               <img
                 key={`logo-${i}`}
                 src={src}
                 alt={clients[i]?.name ?? ""}
                 className="logoClients"
+                loading="lazy"
+                decoding="async"
               />
             ))}
             {/* Duplicate set — the -50% keyframe needs it to loop seamlessly. */}
@@ -83,6 +96,8 @@ export default function Clients({
                   alt=""
                   aria-hidden="true"
                   className="logoClients"
+                  loading="lazy"
+                  decoding="async"
                 />
               ))}
           </div>

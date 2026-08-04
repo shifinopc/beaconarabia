@@ -3377,6 +3377,21 @@ option {
   }
 }
 
+/*
+ * Intro overlay.
+ *
+ * The timings here are the whole of the mobile LCP problem, because this is an
+ * opaque full-viewport panel at z-index 9999 sitting on top of the page. The
+ * inherited values meant it cleared only after: JavaScript downloads and
+ * hydrates, IntroLoader's 600ms timer fires, a 2s transition-delay elapses, and
+ * then a 1s height animation runs — 3.6s of deliberate waiting on top of
+ * whatever the network cost, before the hero could be seen at all.
+ *
+ * The 2s delay in particular looks like a leftover rather than a decision:
+ * nothing reads the overlay during it, it simply holds a white screen in front
+ * of a fully rendered page. Removed, and the animation shortened to 400ms. The
+ * intro still plays; it just stops being the slowest thing on the page.
+ */
 #white-screen {
   position: fixed;
   top: 0;
@@ -3385,10 +3400,41 @@ option {
   height: 100vh;
   background-color: white;
   z-index: 9999;
-  transition: height 1s ease-out;
-  transition-delay: 2s;
+  transition: height 0.4s ease-out;
   opacity: 1;
   overflow: hidden;
+  /*
+   * Dismissed by CSS, not only by JavaScript.
+   *
+   * IntroLoader adds `.hidden` from a useEffect, which cannot run until the
+   * bundle has downloaded, parsed and hydrated. That made the moment the page
+   * becomes visible — and therefore LCP — a function of JavaScript timing on a
+   * mid-range phone, even though the entire page is server-rendered underneath
+   * and ready to paint immediately.
+   *
+   * This animation starts as soon as the stylesheet applies, so the overlay
+   * clears on schedule whether or not React has caught up. The `.hidden` class
+   * still works and settles on the same end state, so the two cannot fight.
+   */
+  animation: intro-dismiss 0.4s ease-out 0.6s forwards;
+}
+
+@keyframes intro-dismiss {
+  to {
+    height: 0;
+  }
+}
+
+/*
+ * Someone who asked for less motion still needs the overlay gone — more
+ * urgently, if anything. Collapse it without the animation.
+ */
+@media (prefers-reduced-motion: reduce) {
+  #white-screen {
+    animation: none;
+    height: 0;
+    transition: none;
+  }
 }
 
 #white-screen.hidden {

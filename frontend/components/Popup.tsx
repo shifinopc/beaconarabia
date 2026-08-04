@@ -139,11 +139,13 @@ export default function Popup({
             border: "none",
           }}
         >
-          <img src="/close-b.svg" alt="" className="closeImage" />
+          <img src="/close-b.svg" alt="" className="closeImage" loading="lazy" decoding="async" />
         </button>
 
         <div className="imageForm">
-          <img src={image} alt="" className="popupImage" />
+          {/* The popup is not shown on load, so nothing here belongs on the
+              critical path — eager, these were preloaded into <head> anyway. */}
+          <img src={image} alt="" className="popupImage" loading="lazy" decoding="async" />
         </div>
 
         <form className="popupForm" style={{ position: "relative" }} onSubmit={handleSubmit}>

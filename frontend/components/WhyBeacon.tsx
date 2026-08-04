@@ -107,6 +107,13 @@ export default function WhyBeacon({
       </div>
 
       <div className="whyBeaconImgContainer">
+        {/*
+          Deliberately not `priority`. These are decorative backgrounds for a
+          band well below the fold, but `priority` preloads them into <head> —
+          bg3.png alone is 146 KB, four times the hero image it was competing
+          with for mobile bandwidth. Without it they load lazily, which is what
+          a below-fold background should do.
+        */}
         <Image
           className="desktop"
           src="/NewSvgs/Backgrounds/bg6.webp"
@@ -116,7 +123,6 @@ export default function WhyBeacon({
           sizes="100vw"
           style={{ width: "100%", height: "auto" }}
           quality={100}
-          priority
           unoptimized
         />
         <Image
@@ -128,7 +134,6 @@ export default function WhyBeacon({
           sizes="100vw"
           style={{ width: "100%", height: "auto" }}
           quality={100}
-          priority
           unoptimized
         />
       </div>

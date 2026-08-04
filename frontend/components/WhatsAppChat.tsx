@@ -22,7 +22,9 @@ export default async function WhatsAppChat() {
       aria-label="Chat with us on WhatsApp"
       className="chat-icon"
     >
-      <img src="/whatsapp.svg" alt="" />
+      {/* Lazy: a floating chat affordance is never the thing a visitor is
+          waiting for, but eager it earns a preload in <head>. */}
+      <img src="/whatsapp.svg" alt="" loading="lazy" decoding="async" />
     </a>
   );
 }
