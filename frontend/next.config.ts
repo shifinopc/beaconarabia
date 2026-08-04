@@ -54,15 +54,25 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
  */
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
   // The CMS serves every content image; data:/blob: cover inlined SVGs.
   "img-src 'self' data: blob: https://cms.beaconarabia.com https://www.googletagmanager.com",
   "font-src 'self' data:",
   // GA and Cloudflare analytics beacons, plus the CMS for form submission.
-  "connect-src 'self' https://cms.beaconarabia.com https://www.google-analytics.com https://static.cloudflareinsights.com",
-  // Nothing is embedded, and nothing should be able to embed this site.
-  "frame-src 'none'",
+  "connect-src 'self' https://cms.beaconarabia.com https://www.google-analytics.com https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+  /**
+   * Turnstile is the only thing this site frames, and it frames itself: the
+   * widget injects an iframe from challenges.cloudflare.com.
+   *
+   * Listed here even though Turnstile is currently inactive (neither
+   * TURNSTILE_SECRET_KEY nor NEXT_PUBLIC_TURNSTILE_SITE_KEY is set in
+   * production, so TurnstileWidget renders nothing). Without these entries,
+   * setting those keys would appear to work and then silently fail at the CSP —
+   * a bot-protection outage that looks like a broken form. Allowing one known
+   * origin to be framed costs nothing while the widget is off.
+   */
+  "frame-src https://challenges.cloudflare.com",
   "frame-ancestors 'self'",
   "object-src 'none'",
   "base-uri 'self'",

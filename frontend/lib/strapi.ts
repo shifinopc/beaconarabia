@@ -276,11 +276,59 @@ async function strapiFetch<T>(
 }
 
 /**
+ * True while `next build` is generating pages.
+ *
+ * Next sets this itself, and it is the only reliable way to tell a build-time
+ * render from a runtime revalidation — which want opposite failure behaviour,
+ * see `onReadFailure` below.
+ */
+const IS_BUILD = process.env.NEXT_PHASE === "phase-production-build";
+
+/**
+ * Decides what a failed CMS read means, and either swallows it or rethrows.
+ *
+ * Two very different things arrive here:
+ *
+ *  - **The content type does not exist yet** (404). Legitimate during setup, and
+ *    an empty section is the correct rendering. Swallow it.
+ *
+ *  - **Strapi is unreachable, timing out, erroring, or rejecting our token.**
+ *    The content exists; we simply could not read it. Returning [] here is a
+ *    lie, and an expensive one: on 4 Aug a short CMS outage cached a hollowed-out
+ *    site — the homepage fell from 119,798 bytes to 62,990 and /blog from 3 posts
+ *    to none, while every page still returned 200 and nothing logged an error.
+ *    It self-healed only because traffic kept triggering revalidation.
+ *
+ * Rethrowing makes the render fail, which is what we want: Next discards a
+ * revalidation that throws and keeps serving the last good page until the CMS
+ * answers again. Stale content beats invented emptiness.
+ *
+ * During `next build` there is no previous page to fall back to and nothing is
+ * being served yet, so a throw would only break the deploy. There we still
+ * degrade to empty — the historical behaviour, now scoped to the one phase
+ * where it is right.
+ */
+function onReadFailure(error: unknown, context: string): void {
+  const status = error instanceof StrapiError ? error.status : 0;
+  // 404 is the one status that genuinely means "there is no such content".
+  const contentAbsent = status === 404;
+
+  if (!IS_BUILD && !contentAbsent) throw error;
+
+  // Logged unconditionally, not just in development: when this fires in
+  // production it means a page rendered with content missing, which is exactly
+  // the silent failure that went unnoticed for the whole of the 4 Aug outage.
+  console.warn(
+    `[strapi] ${context} unavailable${IS_BUILD ? " during build" : ""}:`,
+    error instanceof Error ? error.message : error,
+  );
+}
+
+/**
  * Fetches a collection filtered to one region.
  *
- * Returns [] rather than throwing when Strapi is unreachable or the content
- * type does not exist yet, so the frontend still renders during setup and a
- * CMS outage degrades to an empty section instead of a 500.
+ * Renders empty when the content type does not exist yet; propagates a genuine
+ * CMS failure so the previous good page is kept. See `onReadFailure`.
  */
 async function fetchByRegion<T>(
   endpoint: string,
@@ -298,12 +346,7 @@ async function fetchByRegion<T>(
     // explicit `order` field — see getServices/getFaqs/getClients.
     return Array.isArray(data) ? data : [];
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(
-        `[strapi] ${endpoint} (region=${region}) unavailable:`,
-        error instanceof Error ? error.message : error,
-      );
-    }
+    onReadFailure(error, `${endpoint} (region=${region})`);
     return [];
   }
 }
@@ -361,7 +404,8 @@ export async function getAllPosts(): Promise<Post[]> {
       sort: "createdAt:desc",
     });
     return Array.isArray(data) ? data : [];
-  } catch {
+  } catch (error) {
+    onReadFailure(error, "posts (all regions)");
     return [];
   }
 }
@@ -405,12 +449,7 @@ async function fetchSections(region: RegionKey): Promise<Section[]> {
     });
     return Array.isArray(data) ? data : [];
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(
-        `[strapi] sections (region=${region}) unavailable:`,
-        error instanceof Error ? error.message : error,
-      );
-    }
+    onReadFailure(error, `sections (region=${region})`);
     return [];
   }
 }
@@ -459,17 +498,19 @@ export async function getOffices(): Promise<Office[]> {
       "pagination[pageSize]": "100",
     });
     return Array.isArray(data) ? data : [];
-  } catch {
+  } catch (error) {
+    onReadFailure(error, "offices");
     return [];
   }
 }
 
-/** Single type — returns null if unreachable so callers can fall back. */
+/** Single type — returns null when not created yet so callers can fall back. */
 export async function getSiteSettings(): Promise<SiteSettings | null> {
   try {
     const { data } = await strapiFetch<SiteSettings>("site-setting", { populate: "*" });
     return data ?? null;
-  } catch {
+  } catch (error) {
+    onReadFailure(error, "site-setting");
     return null;
   }
 }
