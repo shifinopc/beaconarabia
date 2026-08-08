@@ -3462,6 +3462,59 @@ option {
 }
 
 /*
+ * Legal pages (privacy policy, terms). New with the platform — the legacy
+ * sites had none — so these are the only styles in this file not ported from
+ * the old design. Measurements follow the blog article page so the two long-
+ * form reading experiences match.
+ */
+.legalContainer {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+
+.legalContainer h1 {
+  font-size: 34px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #024a04;
+}
+
+.legalContainer .legalUpdated {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 28px;
+}
+
+.legalContainer h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 32px 0 10px;
+  color: #024a04;
+}
+
+.legalContainer p {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+.legalContainer .legalListItem {
+  padding-left: 18px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 600px) {
+  .legalContainer {
+    padding: 40px 18px 60px;
+  }
+
+  .legalContainer h1 {
+    font-size: 26px;
+  }
+}
+
+/*
  * Someone who asked for less motion still needs the overlay gone — more
  * urgently, if anything. Collapse it without the animation.
  */

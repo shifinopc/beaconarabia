@@ -176,6 +176,15 @@ const nextConfig: NextConfig = {
       // Anything else under the old scheme is better sent to the homepage than
       // left as a 404 — a soft landing keeps the visitor and passes some equity.
       { source: "/pages/:path*", destination: "/", permanent: true },
+
+      // Legal-page aliases. External audits probed /privacy, /terms-of-service
+      // and /cookie-policy — the names people and tools guess — so each lands
+      // on the real page rather than a 404. Cookie policy content lives inside
+      // the privacy policy, as is proportionate for a site whose only cookies
+      // are analytics.
+      { source: "/privacy", destination: "/privacy-policy", permanent: true },
+      { source: "/terms-of-service", destination: "/terms", permanent: true },
+      { source: "/cookie-policy", destination: "/privacy-policy", permanent: true },
     ];
   },
 

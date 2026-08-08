@@ -57,6 +57,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [...shared, ...only];
   });
 
+  // Legal pages exist once, globally — no regional counterparts, no hreflang.
+  const legalEntries: MetadataRoute.Sitemap = ["privacy-policy", "terms"].map((slug) => ({
+    url: `${SITE_URL}/${slug}`,
+    lastModified,
+    changeFrequency: "yearly" as const,
+    priority: 0.3,
+  }));
+
   /**
    * Articles.
    *
@@ -87,5 +95,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Static routes still ship.
   }
 
-  return [...staticEntries, ...postEntries];
+  return [...staticEntries, ...legalEntries, ...postEntries];
 }

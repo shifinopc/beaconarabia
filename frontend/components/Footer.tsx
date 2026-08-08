@@ -134,8 +134,16 @@ export default async function Footer({ region }: { region: Region }) {
 
       <div className="footerCopyRightContainer">
         <p className="footerCopyRight">
-          © {new Date().getFullYear()} by {SITE.copyrightHolder} | All Right Reserved |
-          Powered by{" "}
+          © {new Date().getFullYear()} by {SITE.copyrightHolder} | All Right Reserved |{" "}
+          {/* Always the global URLs: the legal pages exist once, not per region. */}
+          <Link href="/privacy-policy" style={{ textDecoration: "underline" }}>
+            Privacy Policy
+          </Link>{" "}
+          |{" "}
+          <Link href="/terms" style={{ textDecoration: "underline" }}>
+            Terms
+          </Link>{" "}
+          | Powered by{" "}
           <a href="https://procube.cx/" style={{ textDecoration: "underline" }}>
             procube.cx
           </a>
