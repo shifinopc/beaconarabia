@@ -3462,6 +3462,109 @@ option {
 }
 
 /*
+ * Office location pages. New with the platform, like the legal pages below —
+ * built for the local pack rather than ported from the old design. Shares the
+ * legal pages' reading measure so the two new page types feel like one system.
+ */
+.officeContainer {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 60px 24px 40px;
+}
+
+.officeContainer .officeEyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #024a04;
+  margin-bottom: 8px;
+}
+
+.officeContainer h1 {
+  font-size: 34px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #024a04;
+}
+
+.officeContainer h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 32px 0 10px;
+  color: #024a04;
+}
+
+.officeContainer p,
+.officeContainer li {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.officeContainer .officeLede {
+  font-size: 17px;
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+
+.officeContainer a {
+  color: #024a04;
+  text-decoration: underline;
+}
+
+/* Two columns on desktop, stacked on mobile — address beside phone numbers. */
+.officeDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.officeDetails > section {
+  flex: 1 1 260px;
+}
+
+/* <address> italicises by default in every browser; this is a postal address,
+   not an aside. */
+.officeAddress {
+  font-style: normal;
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.officePhones,
+.officeOtherList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.officeOtherList li {
+  margin-bottom: 10px;
+}
+
+.officeListAddress {
+  display: block;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .officeContainer {
+    padding: 40px 18px 30px;
+  }
+
+  .officeContainer h1 {
+    font-size: 26px;
+  }
+
+  .officeDetails {
+    gap: 24px;
+  }
+}
+
+/*
  * Legal pages (privacy policy, terms). New with the platform — the legacy
  * sites had none — so these are the only styles in this file not ported from
  * the old design. Measurements follow the blog article page so the two long-

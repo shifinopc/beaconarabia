@@ -25,6 +25,8 @@ export default async function Footer({ region }: { region: Region }) {
     { text: "Partners", href: `${base}/partners` },
     { text: "Careers", href: `${base}/careers` },
     { text: "Contact", href: `${base}/contact` },
+    // Not region-prefixed: the office pages are global, one per city.
+    { text: "Offices", href: "/offices" },
   ];
 
   return (

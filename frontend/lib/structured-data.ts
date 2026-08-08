@@ -78,6 +78,83 @@ export function websiteSchema(): JsonLd {
   };
 }
 
+/** ISO 3166-1 alpha-2 for each country the Office content type knows about. */
+const OFFICE_COUNTRY_CODES: Record<string, string> = {
+  ksa: "SA",
+  uae: "AE",
+  bahrain: "BH",
+  qatar: "QA",
+};
+
+const OFFICE_COUNTRY_NAMES: Record<string, string> = {
+  ksa: "Saudi Arabia",
+  uae: "United Arab Emirates",
+  bahrain: "Bahrain",
+  qatar: "Qatar",
+};
+
+/**
+ * One physical office, as a LocalBusiness branch of the company.
+ *
+ * This is the piece that makes an office eligible to appear in Google's local
+ * pack — the map results that render *above* organic listings for queries like
+ * "business setup consultants in Riyadh". The organisation node above describes
+ * the company as a whole and carries a single address; it cannot represent
+ * seven of them.
+ *
+ * `parentOrganization` points back at the company node by @id, so the seven
+ * branches are understood as one business with seven locations rather than
+ * seven unrelated firms — which is what emitting seven bare LocalBusiness nodes
+ * would imply.
+ *
+ * Deliberately omitted: `geo` and `openingHoursSpecification`. Both are strong
+ * local-ranking signals, and both would have to be invented here — the Office
+ * content type stores neither. Wrong coordinates are worse than absent ones,
+ * so they are left out until the CMS can supply real values. See the note in
+ * app/offices/[city]/page.tsx.
+ */
+export function officeSchema(office: {
+  city: string;
+  country: string;
+  address: string;
+  phones?: string[] | null;
+  mapUrl?: string;
+}, url: string): JsonLd {
+  const countryName = OFFICE_COUNTRY_NAMES[office.country] ?? office.country;
+  const cityName = titleCaseCity(office.city);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "@id": `${url}#office`,
+    name: `Beacon — ${cityName}`,
+    parentOrganization: { "@id": ORGANISATION_ID },
+    url,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: office.address,
+      addressLocality: cityName,
+      addressCountry: OFFICE_COUNTRY_CODES[office.country] ?? office.country,
+    },
+    ...(office.phones?.length ? { telephone: office.phones } : {}),
+    ...(office.mapUrl ? { hasMap: office.mapUrl } : {}),
+    areaServed: { "@type": "Country", name: countryName },
+  };
+}
+
+/**
+ * Office cities are stored inconsistently — "JEDDAH", "Riyadh", "DUBAI" — so
+ * anything user-facing has to normalise rather than print the raw value.
+ */
+export function titleCaseCity(city: string): string {
+  return city
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export interface Crumb {
   name: string;
   /** Path relative to the site root, e.g. "/ae/about". */

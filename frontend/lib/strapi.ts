@@ -504,6 +504,22 @@ export async function getOffices(): Promise<Office[]> {
   }
 }
 
+/**
+ * URL slug for an office, derived from its city.
+ *
+ * Cities are stored inconsistently ("JEDDAH", "Riyadh", "DUBAI"), so the slug
+ * has to normalise rather than trust the stored casing — otherwise the same
+ * office would be reachable at two different URLs depending on how it was
+ * typed, which is a duplicate-content problem of our own making.
+ */
+export function officeSlug(office: Pick<Office, "city">): string {
+  return office.city
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 /** Single type — returns null when not created yet so callers can fall back. */
 export async function getSiteSettings(): Promise<SiteSettings | null> {
   try {

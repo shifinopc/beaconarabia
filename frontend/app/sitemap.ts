@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { REGIONS, REGION_KEYS, WHY_PAGES, SITE_URL, regionUrl } from "@/lib/regions";
-import { getAllPosts, postPath } from "@/lib/strapi";
+import { getAllPosts, getOffices, officeSlug, postPath } from "@/lib/strapi";
 
 /**
  * Generated sitemap with hreflang alternates.
@@ -66,6 +66,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   /**
+   * Office pages — the index plus one per city.
+   *
+   * Priority 0.7, below the section pages but above articles: these target
+   * transactional local queries ("business setup consultants in Riyadh") and
+   * are the pages a Google Business Profile points at.
+   *
+   * Like the articles below, a CMS outage degrades to omitting them rather
+   * than taking the whole sitemap down.
+   */
+  let officeEntries: MetadataRoute.Sitemap = [
+    {
+      url: `${SITE_URL}/offices`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    },
+  ];
+  try {
+    const offices = await getOffices();
+    officeEntries = [
+      ...officeEntries,
+      ...offices.map((office) => ({
+        url: `${SITE_URL}/offices/${officeSlug(office)}`,
+        lastModified,
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+      })),
+    ];
+  } catch {
+    // Index entry still ships.
+  }
+
+  /**
    * Articles.
    *
    * Previously omitted entirely, so every post was reachable only by crawling
@@ -95,5 +128,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Static routes still ship.
   }
 
-  return [...staticEntries, ...legalEntries, ...postEntries];
+  return [...staticEntries, ...officeEntries, ...legalEntries, ...postEntries];
 }
