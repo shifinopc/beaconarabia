@@ -416,6 +416,42 @@ export function postPath(post: Pick<Post, "slug" | "region">): string {
   return `${base}/blog/${post.slug}`;
 }
 
+/**
+ * Every service across all regions, for prerendering the detail routes.
+ *
+ * Mirrors getAllPosts: each service belongs to one region, so the region/slug
+ * pairing comes from the service itself rather than a cross product, which
+ * would build /ae/services/<a-saudi-service> and other URLs that must not exist.
+ */
+export async function getAllServices(): Promise<Service[]> {
+  try {
+    const { data } = await strapiFetch<Service[]>("services", {
+      "pagination[pageSize]": "100",
+      sort: "order:asc",
+    });
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    onReadFailure(error, "services (all regions)");
+    return [];
+  }
+}
+
+export async function getServiceBySlug(
+  region: RegionKey,
+  slug: string,
+): Promise<Service | null> {
+  const services = await fetchByRegion<Service>("services", region, {
+    "filters[slug][$eq]": slug,
+  });
+  return services[0] ?? null;
+}
+
+/** The URL a service lives at, derived from its own region. */
+export function servicePath(service: Pick<Service, "slug" | "region">): string {
+  const base = service.region === "global" ? "" : `/${service.region}`;
+  return `${base}/services/${service.slug}`;
+}
+
 export const getPages = (region: RegionKey) => fetchByRegion<Page>("pages", region);
 
 export const getClients = (region: RegionKey) =>

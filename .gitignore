@@ -29,3 +29,11 @@ deploy/*.zip
 deploy/*.tar.gz
 deploy/*.sql
 deploy/db-parts/
+
+# Deploy artifacts: build archives and database dumps.
+# beacon_live_ready.sql contains the admin_users and strapi_api_tokens tables
+# (password and token hashes), and the archives are ~71 MB of rebuildable output.
+deploy/
+
+# Strapi writes this on every version check; it is machine state, not source.
+cms/.strapi-updater.json
