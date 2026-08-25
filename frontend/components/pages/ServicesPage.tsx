@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import styles from "@/styles/servicesPage.module.css";
 import type { Region } from "@/lib/regions";
 import {
@@ -8,6 +9,7 @@ import {
   getTestimonials,
   mediaUrl,
   sectionByKey,
+  servicePath,
 } from "@/lib/strapi";
 import PageShell from "../PageShell";
 import CtaButton from "../CtaButton";
@@ -105,7 +107,11 @@ export default async function ServicesPage({ region }: { region: Region }) {
             const details = (service.details ?? []) as string[];
 
             return (
-              <div
+              /* The whole card is the link, not a "read more" beneath it: the
+                 card is the click target users already aim at, and the h3
+                 inside gives the anchor a descriptive name for free. */
+              <Link
+                href={servicePath(service)}
                 className={`${styles.cardContainer} cardContainer`}
                 key={service.documentId}
               >
@@ -138,7 +144,7 @@ export default async function ServicesPage({ region }: { region: Region }) {
                     ))}
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

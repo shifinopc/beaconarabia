@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Region } from "@/lib/regions";
-import { getServices, mediaUrl } from "@/lib/strapi";
+import { getServices, mediaUrl, servicePath } from "@/lib/strapi";
 import ExploreButton from "./ExploreButton";
 
 /**
@@ -47,7 +47,11 @@ export default async function Services({
         {services.map((service) => {
           const icon = mediaUrl(service.icon);
           return (
-            <div className="cardContainer" key={service.documentId}>
+            <Link
+              href={servicePath(service)}
+              className="cardContainer"
+              key={service.documentId}
+            >
               <div className="imgContainer">
                 {icon && (
                   <Image
@@ -66,7 +70,7 @@ export default async function Services({
               <div className="servicesDescContainer">
                 <p className="servicesDesc">{service.summary}</p>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

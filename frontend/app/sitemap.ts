@@ -1,6 +1,13 @@
 import type { MetadataRoute } from "next";
 import { REGIONS, REGION_KEYS, WHY_PAGES, SITE_URL, regionUrl } from "@/lib/regions";
-import { getAllPosts, getOffices, officeSlug, postPath } from "@/lib/strapi";
+import {
+  getAllPosts,
+  getAllServices,
+  getOffices,
+  officeSlug,
+  postPath,
+  servicePath,
+} from "@/lib/strapi";
 
 /**
  * Generated sitemap with hreflang alternates.
@@ -99,6 +106,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   /**
+   * Service detail pages — six offerings in each of the three regions.
+   *
+   * Priority 0.8, matching the section pages: these are the commercial pages
+   * the business actually sells from. servicePath derives the regional prefix
+   * from the service itself, so each URL is listed once, at the one address it
+   * lives at.
+   */
+  let serviceEntries: MetadataRoute.Sitemap = [];
+  try {
+    const services = await getAllServices();
+    serviceEntries = services
+      .filter((service) => service.slug)
+      .map((service) => ({
+        url: `${SITE_URL}${servicePath(service)}`,
+        lastModified,
+        changeFrequency: "monthly" as const,
+        priority: 0.8,
+      }));
+  } catch {
+    // Static routes still ship.
+  }
+
+  /**
    * Articles.
    *
    * Previously omitted entirely, so every post was reachable only by crawling
@@ -128,5 +158,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Static routes still ship.
   }
 
-  return [...staticEntries, ...officeEntries, ...legalEntries, ...postEntries];
+  return [
+    ...staticEntries,
+    ...serviceEntries,
+    ...officeEntries,
+    ...legalEntries,
+    ...postEntries,
+  ];
 }

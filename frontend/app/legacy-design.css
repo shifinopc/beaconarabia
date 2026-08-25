@@ -3954,3 +3954,16 @@ option {
     transform: scale(0.7);
   }
 }
+/*
+ * Service cards are anchors now, not divs — the whole card links to its detail
+ * page. Browsers give <a> a default colour and underline that the card design
+ * never had, and these rules take it back. Nothing else about the card changes:
+ * .cardContainer already sets display:flex, which applies to an anchor exactly
+ * as it did to a div.
+ */
+a.cardContainer,
+a.cardContainer:hover,
+a.cardContainer:visited {
+  color: inherit;
+  text-decoration: none;
+}
