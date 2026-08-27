@@ -46,18 +46,32 @@ export default function BlogCards({
                 />
               )}
 
+              {/*
+                These were all h6, which is why the page reported a broken
+                heading hierarchy: an h2 section heading followed by h6 cards,
+                skipping h3 to h5 entirely. A category label, a date and a
+                "Read More" affordance are not headings at all — a screen
+                reader listing the page's headings was getting "Business
+                Incorporation", "8/18/2026", "Read More" as structure.
+
+                The card's own title is a real heading and becomes h3, one
+                level under the h2 that introduces the list. The rest are
+                spans. Appearance is unchanged: .text3/.text4/.text5 set their
+                own font-size, weight and colour, so nothing was inheriting
+                h6 defaults.
+              */}
               <div className={styles.dateAndLocationContainer}>
                 <div className={styles.dateTextContainer}>
-                  <h6 className={styles.text4}>{post.category}</h6>
+                  <span className={styles.text4}>{post.category}</span>
                   <div className={styles.blogDot} />
-                  <h6 className={styles.text3}>{date}</h6>
+                  <span className={styles.text3}>{date}</span>
                 </div>
               </div>
 
               <div className={styles.companyBlogContent}>
-                <h6 className={styles.text5}>{post.subtitle || post.title}</h6>
+                <h3 className={styles.text5}>{post.subtitle || post.title}</h3>
                 <div className={styles.readmore}>
-                  <h6>Read More</h6>
+                  <span>Read More</span>
                   <Image
                     src="/blackArrow.svg"
                     width={23}

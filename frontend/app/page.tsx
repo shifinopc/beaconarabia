@@ -9,10 +9,29 @@ import { REGIONS, alternatesFor } from "@/lib/regions";
  * dynamic segment. That is what lets /about belong to the global site while
  * /ae and /sa route to the regional pages.
  */
+/**
+ * Title and description carry the markets, not just the positioning.
+ *
+ * The previous title — "Your Global Advisory Partner For Business Success" —
+ * was the brand line, and it named neither a service nor a place. Search
+ * console data backs up what that costs: five ranking keywords in Saudi, none
+ * in the top ten, while the same site already appears in ten local packs. For a
+ * firm whose realistic wins are "business setup in Riyadh"-shaped queries, the
+ * strongest relevance signals on the site were spending themselves on a slogan.
+ *
+ * The brand line still leads the page visually — this changes the search
+ * snippet, not the hero.
+ *
+ * "| Beacon" is written out here rather than left to the root layout's
+ * `%s | Beacon` template. That template only applies to *nested* segments, and
+ * app/page.tsx sits in the same segment as the layout that defines it, so the
+ * homepage — the one page most likely to be seen in a brand search — would
+ * otherwise be the only page on the site without the brand in its title.
+ */
 export const metadata: Metadata = {
-  title: "Your Global Advisory Partner For Business Success",
+  title: "Business Setup & Advisory in Saudi Arabia & UAE | Beacon",
   description:
-    "Beacon provides business incorporation, consultation, accounting, audit and technology services across the GCC.",
+    "Business setup and advisory in Saudi Arabia and the UAE. Company formation, licensing, accounting, audit and tax, from offices in Riyadh, Jeddah and Dubai.",
   alternates: alternatesFor(REGIONS.global),
 };
 
