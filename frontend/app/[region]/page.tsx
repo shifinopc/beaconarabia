@@ -23,14 +23,42 @@ export async function generateMetadata({
   if (!isRegionSegment(segment)) return {};
 
   const region = REGIONS[segment];
-  const titles: Record<string, string> = {
-    ae: "Launch and Expand Your Business In UAE",
-    sa: "Setup Your Business in Saudi Arabia",
+
+  /**
+   * Titles and descriptions are written per region, not generated from a
+   * template.
+   *
+   * The previous description was `...advisory services in ${region.label}` for
+   * both, which produced two near-identical snippets competing for the same
+   * queries — the keyword cannibalisation these regional editions exist to
+   * avoid. Each now leads with what that market actually searches for: mainland
+   * and free zone routes in the UAE, MISA registration and Vision 2030 in the
+   * Kingdom.
+   *
+   * Titles gain the service term alongside the place. "Setup Your Business in
+   * Saudi Arabia" named the country but not the job; "company formation" and
+   * "business setup" are the phrases with the volume behind them.
+   *
+   * Length is tuned against the root layout's `%s | Beacon` template, which
+   * does apply here because these are nested segments — unlike the global
+   * homepage, which has to spell the brand out itself.
+   */
+  const meta: Record<string, { title: string; description: string }> = {
+    ae: {
+      title: "Business Setup & Company Formation in Dubai, UAE",
+      description:
+        "Set up a business in the UAE with Beacon. Mainland, free zone and offshore incorporation, licensing, accounting, audit and tax, from our Dubai office.",
+    },
+    sa: {
+      title: "Business Setup & Company Formation in Saudi Arabia",
+      description:
+        "Enter the Saudi market with Beacon. MISA registration, company formation, licensing, accounting, audit and tax, from offices in Riyadh, Jeddah and Dammam.",
+    },
   };
 
   return {
-    title: titles[segment],
-    description: `Beacon business setup, incorporation and advisory services in ${region.label}.`,
+    title: meta[segment].title,
+    description: meta[segment].description,
     alternates: alternatesFor(region),
   };
 }
