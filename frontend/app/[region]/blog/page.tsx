@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import BlogListPage from "@/components/pages/BlogListPage";
-import { REGIONS, SUB_REGIONS, alternatesFor, isRegionSegment } from "@/lib/regions";
+import { REGIONS, SUB_REGIONS, isRegionSegment } from "@/lib/regions";
+import { regionPageMetadata } from "@/lib/region-page-meta";
 
 type Params = { region: string };
 
@@ -18,13 +19,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { region: segment } = await params;
   if (!isRegionSegment(segment)) return {};
-  const region = REGIONS[segment];
-
-  return {
-    title: "Blog",
-    description: `Insights and updates from Beacon. In ${region.label}.`,
-    alternates: alternatesFor(region, "blog"),
-  };
+  return regionPageMetadata(segment, "blog");
 }
 
 export default async function Page({ params }: { params: Promise<Params> }) {
