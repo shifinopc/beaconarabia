@@ -17,7 +17,15 @@ export async function generateStaticParams(): Promise<Params[]> {
   }
 }
 
-export const dynamicParams = false;
+/**
+ * A service added in the CMS renders without waiting for a deploy.
+ *
+ * Same reason as the blog routes: with `false`, anything published after
+ * the last build 404s while the services page links straight to it.
+ * ServiceDetailPage calls notFound() when the slug matches nothing, so an
+ * invented URL still 404s.
+ */
+export const dynamicParams = true;
 
 export async function generateMetadata({
   params,

@@ -27,7 +27,12 @@ export async function generateStaticParams(): Promise<Params[]> {
 }
 
 /** Unknown region/slug pairs 404 rather than being rendered on demand. */
-export const dynamicParams = false;
+/**
+ * As the global service route: a service published after the last build
+ * renders on demand rather than 404ing. Unknown slugs still 404 via
+ * ServiceDetailPage's notFound().
+ */
+export const dynamicParams = true;
 
 export async function generateMetadata({
   params,

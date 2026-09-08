@@ -76,10 +76,14 @@ export async function generateStaticParams(): Promise<Params[]> {
 }
 
 /**
- * Only the offices that exist. An arbitrary /offices/anywhere should 404
- * rather than render an empty page that Google may index.
+ * An office added in the CMS appears without a deploy.
+ *
+ * The original note here worried that `true` would let /offices/anywhere
+ * render an empty page for Google to index. It cannot: findOffice returns null
+ * for an unknown city and the page component calls notFound() on it. What
+ * `false` actually did was 404 a real office until someone redeployed.
  */
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateMetadata({
   params,

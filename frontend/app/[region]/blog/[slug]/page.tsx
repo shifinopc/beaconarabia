@@ -27,8 +27,15 @@ export async function generateStaticParams(): Promise<Params[]> {
   }
 }
 
-/** Unknown region/slug pairs 404 rather than being rendered on demand. */
-export const dynamicParams = false;
+/**
+ * Region/slug pairs not known at build time render on demand.
+ *
+ * Was `false`, which meant an article published in the CMS 404'd until the next
+ * deploy — see the global route for why that trade no longer holds. An unknown
+ * pair still 404s: the region is checked below, and BlogPostPage calls
+ * notFound() when the post does not exist.
+ */
+export const dynamicParams = true;
 
 export async function generateMetadata({
   params,
