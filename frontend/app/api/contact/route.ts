@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { enquirySchema, regionKey } from "@/lib/enquiry-schema";
+import { sendLead } from "@/lib/lead-webhook";
 import { STRAPI_URL } from "@/lib/strapi";
 
 /**
@@ -126,6 +127,31 @@ export async function POST(request: Request) {
       { error: "Something went wrong sending your message. Please try again." },
       { status: 502 },
     );
+  }
+
+  /**
+   * Mirror the enquiry to lead tracking, only once it is safely in Strapi.
+   *
+   * Deliberately not awaited: the visitor's confirmation must not wait on a
+   * third-party service, and sendLead resolves on every path so the floating
+   * promise cannot become an unhandled rejection.
+   *
+   * Contact submissions only. This endpoint also serves the newsletter and the
+   * first-visit popup, but LEAD_WEBHOOK_URL pins `form=Contact`, so sending
+   * those here would file newsletter signups as contact enquiries. Tracking
+   * them needs its own URL — see the note in lib/lead-webhook.ts.
+   *
+   * Bots never reach this line: the honeypot returns above.
+   */
+  if (body.kind === "contact") {
+    void sendLead({
+      name: body.name,
+      email: body.email,
+      phone: body.phone,
+      subject: body.subject,
+      message: body.message,
+      page: body.sourcePath,
+    });
   }
 
   return NextResponse.json({ ok: true });
