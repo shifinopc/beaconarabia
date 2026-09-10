@@ -78,6 +78,73 @@ export function websiteSchema(): JsonLd {
   };
 }
 
+/**
+ * One service offering.
+ *
+ * The service pages previously emitted only a breadcrumb and the site-wide
+ * organisation node, which told a search or answer engine that a page existed
+ * but nothing about what it sells. These are the commercial pages — the ones an
+ * assistant should be able to quote when asked who handles company formation in
+ * Saudi Arabia — and they were the least described on the site.
+ *
+ * Every field is taken from the CMS entry and is visible on the page. Nothing
+ * here is invented: `hasOfferCatalog` lists the sub-services already rendered
+ * in the body, so the markup and the page agree. That matters beyond honesty —
+ * schema describing content a visitor cannot see is treated as spam.
+ *
+ * Deliberately no `offers` or `priceRange`: Beacon does not publish prices, and
+ * inventing a price band to win a rich result would be a lie about a
+ * professional service.
+ */
+export function serviceSchema(
+  service: { title: string; summary?: string; details?: string[] | null },
+  region: Region,
+  url: string,
+): JsonLd {
+  // Matches the organisation node's own areaServed, narrowed to the edition the
+  // page belongs to — a Saudi service page should not claim UAE coverage.
+  const areaServed =
+    region.key === "ae"
+      ? [{ "@type": "Country", name: "United Arab Emirates" }]
+      : region.key === "sa"
+        ? [{ "@type": "Country", name: "Saudi Arabia" }]
+        : [
+            { "@type": "Country", name: "Saudi Arabia" },
+            { "@type": "Country", name: "United Arab Emirates" },
+            { "@type": "Place", name: "GCC" },
+          ];
+
+  const subServices = (service.details ?? []).filter(
+    (detail) => typeof detail === "string" && detail.trim(),
+  );
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${url}#service`,
+    name: service.title,
+    ...(service.summary?.trim() ? { description: service.summary.trim() } : {}),
+    url,
+    serviceType: service.title,
+    provider: { "@id": ORGANISATION_ID },
+    areaServed,
+    // Omitted entirely when a service has no sub-services listed, rather than
+    // emitting an empty catalogue.
+    ...(subServices.length
+      ? {
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: `${service.title} services`,
+            itemListElement: subServices.map((detail) => ({
+              "@type": "Offer",
+              itemOffered: { "@type": "Service", name: detail },
+            })),
+          },
+        }
+      : {}),
+  };
+}
+
 /** ISO 3166-1 alpha-2 for each country the Office content type knows about. */
 const OFFICE_COUNTRY_CODES: Record<string, string> = {
   ksa: "SA",

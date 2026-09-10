@@ -14,6 +14,7 @@ import {
   breadcrumbSchema,
   jsonLdProps,
   regionCrumbs,
+  serviceSchema,
 } from "@/lib/structured-data";
 import PageShell from "../PageShell";
 import BlogContentBlock, { type ContentBlock } from "../BlogContentBlock";
@@ -79,9 +80,19 @@ export default async function ServiceDetailPage({
     { name: service.title, path: `/services/${service.slug}` },
   ]);
 
+  /**
+   * Both nodes in one script tag rather than two, which is how the office and
+   * article pages already do it — a single graph is easier for a parser to
+   * relate than two disconnected blocks.
+   */
+  const schema = [
+    serviceSchema(service, region, `${base}/services/${service.slug}`),
+    breadcrumbSchema(crumbs),
+  ];
+
   return (
     <PageShell region={region}>
-      <script {...jsonLdProps(breadcrumbSchema(crumbs))} />
+      <script {...jsonLdProps(schema)} />
 
       <div className={styles.bgContainer}>
         <div className={styles.topInnerContainer}>
