@@ -46,14 +46,21 @@ function oneLine(text: string | undefined, max = 140): string {
 
 export async function GET() {
   /**
-   * Each fetch is guarded separately. A CMS outage should cost the section it
-   * feeds, not the whole file — a partial map is still useful, an error page is
-   * not.
+   * Not guarded. An earlier version caught each fetch on the reasoning that "a
+   * partial map is still useful, an error page is not" — but that framed the
+   * choice wrongly. Letting the failure propagate does not serve an error page:
+   * this route is revalidated hourly, so a failed rebuild is discarded and the
+   * last good file keeps being served. Catching instead published a map with
+   * every service, office and article missing, then cached it for an hour.
+   *
+   * getAllServices, getOffices and getAllPosts already tell the two failures
+   * apart — see lib/strapi.ts — so a genuinely empty collection still renders
+   * empty, and only an unreachable CMS propagates.
    */
   const [services, offices, posts] = await Promise.all([
-    getAllServices().catch(() => []),
-    getOffices().catch(() => []),
-    getAllPosts().catch(() => []),
+    getAllServices(),
+    getOffices(),
+    getAllPosts(),
   ]);
 
   const lines: string[] = [];

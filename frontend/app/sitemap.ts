@@ -79,31 +79,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * transactional local queries ("business setup consultants in Riyadh") and
    * are the pages a Google Business Profile points at.
    *
-   * Like the articles below, a CMS outage degrades to omitting them rather
-   * than taking the whole sitemap down.
+   * The index is listed unconditionally; the city pages come from the CMS. See
+   * the articles block below for why neither fetch is wrapped in try/catch.
    */
-  let officeEntries: MetadataRoute.Sitemap = [
+  const offices = await getOffices();
+  const officeEntries: MetadataRoute.Sitemap = [
     {
       url: `${SITE_URL}/offices`,
       lastModified,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     },
+    ...offices.map((office) => ({
+      url: `${SITE_URL}/offices/${officeSlug(office)}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
   ];
-  try {
-    const offices = await getOffices();
-    officeEntries = [
-      ...officeEntries,
-      ...offices.map((office) => ({
-        url: `${SITE_URL}/offices/${officeSlug(office)}`,
-        lastModified,
-        changeFrequency: "monthly" as const,
-        priority: 0.7,
-      })),
-    ];
-  } catch {
-    // Index entry still ships.
-  }
 
   /**
    * Service detail pages — six offerings in each of the three regions.
@@ -113,20 +106,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * from the service itself, so each URL is listed once, at the one address it
    * lives at.
    */
-  let serviceEntries: MetadataRoute.Sitemap = [];
-  try {
-    const services = await getAllServices();
-    serviceEntries = services
-      .filter((service) => service.slug)
-      .map((service) => ({
-        url: `${SITE_URL}${servicePath(service)}`,
-        lastModified,
-        changeFrequency: "monthly" as const,
-        priority: 0.8,
-      }));
-  } catch {
-    // Static routes still ship.
-  }
+  const services = await getAllServices();
+  const serviceEntries: MetadataRoute.Sitemap = services
+    .filter((service) => service.slug)
+    .map((service) => ({
+      url: `${SITE_URL}${servicePath(service)}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    }));
 
   /**
    * Articles.
@@ -137,26 +125,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * derives the regional prefix), so like the "why" pages these carry no
    * hreflang alternates: there is no counterpart to point at.
    *
-   * A CMS outage must not take the sitemap down with it, so a failed fetch
-   * degrades to the static routes rather than throwing.
+   * The fetch is deliberately not wrapped in try/catch. getAllPosts already
+   * distinguishes the two failures that matter — see lib/strapi.ts — and
+   * catching here defeated it: a CMS blip during an hourly rebuild published a
+   * sitemap with every article and service missing, then cached that for an
+   * hour. Letting the failure propagate makes Next discard the rebuild and keep
+   * serving the last good sitemap, which is what "a CMS outage must not take
+   * the sitemap down" should have meant.
    */
-  let postEntries: MetadataRoute.Sitemap = [];
-  try {
-    const posts = await getAllPosts();
-    postEntries = posts
-      .filter((post) => post.slug)
-      .map((post) => ({
-        url: `${SITE_URL}${postPath(post)}`,
-        lastModified: post.publishedAt ? new Date(post.publishedAt) : lastModified,
-        changeFrequency: "yearly" as const,
-        // Below the section pages: articles are the long tail, and an
-        // undifferentiated sitemap tells search engines nothing about which
-        // pages matter.
-        priority: 0.6,
-      }));
-  } catch {
-    // Static routes still ship.
-  }
+  const posts = await getAllPosts();
+  const postEntries: MetadataRoute.Sitemap = posts
+    .filter((post) => post.slug)
+    .map((post) => ({
+      url: `${SITE_URL}${postPath(post)}`,
+      lastModified: post.publishedAt ? new Date(post.publishedAt) : lastModified,
+      changeFrequency: "yearly" as const,
+      // Below the section pages: articles are the long tail, and an
+      // undifferentiated sitemap tells search engines nothing about which
+      // pages matter.
+      priority: 0.6,
+    }));
 
   return [
     ...staticEntries,
