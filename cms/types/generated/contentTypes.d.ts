@@ -743,19 +743,24 @@ export interface ApiOfficeOffice extends Struct.CollectionTypeSchema {
   attributes: {
     address: Schema.Attribute.Text & Schema.Attribute.Required;
     city: Schema.Attribute.String & Schema.Attribute.Required;
+    closesAt: Schema.Attribute.Time;
     country: Schema.Attribute.Enumeration<['ksa', 'uae', 'bahrain', 'qatar']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'ksa'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    latitude: Schema.Attribute.Decimal;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::office.office'
     > &
       Schema.Attribute.Private;
+    longitude: Schema.Attribute.Decimal;
     mapUrl: Schema.Attribute.String;
+    openDays: Schema.Attribute.JSON;
+    opensAt: Schema.Attribute.Time;
     order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     phones: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
