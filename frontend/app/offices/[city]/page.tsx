@@ -8,6 +8,7 @@ import { getOffices, officeSlug, type Office } from "@/lib/strapi";
 import {
   breadcrumbSchema,
   jsonLdProps,
+  officeHours,
   officeSchema,
   titleCaseCity,
 } from "@/lib/structured-data";
@@ -26,10 +27,11 @@ import {
  * or closing an office remains a CMS edit — the same principle OfficeLocations
  * follows on the contact page.
  *
- * NOTE FOR THE CMS: two fields would materially strengthen these pages and
- * cannot be invented here — latitude/longitude (for schema `geo`) and opening
- * hours (for `openingHoursSpecification`). Both are real local-ranking signals.
- * Adding them to the Office content type is the single highest-value follow-up.
+ * Coordinates and opening hours now exist on the Office content type and feed
+ * both the page and its schema. They are optional: an office with neither
+ * renders exactly as it did before. Filling them in for all seven is worth
+ * doing — both are direct inputs to local ranking — but the values have to come
+ * from someone who knows them, not from guessing at an address.
  */
 
 interface Params {
@@ -114,6 +116,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   const country = COUNTRY_NAMES[office.country] ?? office.country;
   const region = regionKeyFor(office);
   const url = `${SITE_URL}/offices/${city}`;
+  const hours = officeHours(office);
 
   const schema = [
     officeSchema(office, url),
@@ -144,6 +147,15 @@ export default async function Page({ params }: { params: Promise<Params> }) {
             {/* An address is a postal address, not a paragraph — <address> is
                 what it is, and it gives assistive tech the right announcement. */}
             <address className="officeAddress">{office.address}</address>
+            {hours && (
+              // Printed, not only marked up. openingHoursSpecification
+              // describing hours a visitor cannot read on the page is the same
+              // mismatch Google treats as spam — and someone deciding whether
+              // to visit wants this more than a crawler does.
+              <p className="officeHours">
+                <strong>Opening hours:</strong> {hours.label}
+              </p>
+            )}
             {office.mapUrl && (
               <p>
                 <a href={office.mapUrl} target="_blank" rel="noreferrer">

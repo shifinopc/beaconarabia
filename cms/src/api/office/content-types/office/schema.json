@@ -20,6 +20,11 @@
     "address": { "type": "text", "required": true },
     "phones": { "type": "json" },
     "mapUrl": { "type": "string" },
+    "latitude": { "type": "decimal" },
+    "longitude": { "type": "decimal" },
+    "openDays": { "type": "json" },
+    "opensAt": { "type": "time" },
+    "closesAt": { "type": "time" },
     "wide": { "type": "boolean", "default": false },
     "order": { "type": "integer", "default": 0 }
   }

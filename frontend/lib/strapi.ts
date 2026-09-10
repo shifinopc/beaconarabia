@@ -126,6 +126,22 @@ export interface Office {
   address: string;
   phones?: string[] | null;
   mapUrl?: string;
+  /**
+   * Coordinates and opening hours, all optional.
+   *
+   * Both are direct inputs to Google's local ranking, and neither can be
+   * derived from the address with enough confidence to be worth guessing — a
+   * pin in the wrong place is worse than no pin. The pages and the schema both
+   * omit whatever is missing, so an office with no coordinates renders exactly
+   * as it does today.
+   */
+  latitude?: number | null;
+  longitude?: number | null;
+  /** Day names, e.g. ["Sunday","Monday","Tuesday","Wednesday","Thursday"]. */
+  openDays?: string[] | null;
+  /** Strapi `time` values, "09:00:00.000". */
+  opensAt?: string | null;
+  closesAt?: string | null;
   wide?: boolean;
   order?: number;
 }

@@ -174,11 +174,11 @@ const OFFICE_COUNTRY_NAMES: Record<string, string> = {
  * seven unrelated firms — which is what emitting seven bare LocalBusiness nodes
  * would imply.
  *
- * Deliberately omitted: `geo` and `openingHoursSpecification`. Both are strong
- * local-ranking signals, and both would have to be invented here — the Office
- * content type stores neither. Wrong coordinates are worse than absent ones,
- * so they are left out until the CMS can supply real values. See the note in
- * app/offices/[city]/page.tsx.
+ * `geo` and `openingHoursSpecification` are emitted only when the CMS carries
+ * real values. Both are strong local-ranking signals and both were previously
+ * omitted entirely because the content type had nowhere to store them; the
+ * fields exist now, but an office nobody has filled in yet still publishes
+ * neither. A pin in the wrong place is worse than no pin.
  */
 export function officeSchema(office: {
   city: string;
@@ -186,9 +186,17 @@ export function officeSchema(office: {
   address: string;
   phones?: string[] | null;
   mapUrl?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  openDays?: string[] | null;
+  opensAt?: string | null;
+  closesAt?: string | null;
 }, url: string): JsonLd {
   const countryName = OFFICE_COUNTRY_NAMES[office.country] ?? office.country;
   const cityName = titleCaseCity(office.city);
+  // Same helper the page uses to print the hours, so the markup and the
+  // sentence a visitor reads can never disagree.
+  const hours = officeHours(office);
 
   return {
     "@context": "https://schema.org",
@@ -205,8 +213,90 @@ export function officeSchema(office: {
     },
     ...(office.phones?.length ? { telephone: office.phones } : {}),
     ...(office.mapUrl ? { hasMap: office.mapUrl } : {}),
+    ...(typeof office.latitude === "number" && typeof office.longitude === "number"
+      ? {
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: office.latitude,
+            longitude: office.longitude,
+          },
+        }
+      : {}),
+    ...(hours
+      ? {
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: hours.days,
+              opens: hours.opens,
+              closes: hours.closes,
+            },
+          ],
+        }
+      : {}),
     areaServed: { "@type": "Country", name: countryName },
   };
+}
+
+/** The seven day names schema.org accepts, in week order for display. */
+const DAY_ORDER = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+/**
+ * Turns a Strapi `time` ("09:00:00.000") into "09:00".
+ *
+ * schema.org wants HH:MM, and so does a human reading a page — nobody needs
+ * to be told an office opens at nine o'clock and zero milliseconds.
+ */
+function toClockTime(value?: string | null): string | null {
+  if (!value) return null;
+  const match = /^(\d{2}):(\d{2})/.exec(value.trim());
+  return match ? `${match[1]}:${match[2]}` : null;
+}
+
+/**
+ * Opening hours in a form both the page and the schema can use.
+ *
+ * Returns null unless all three parts are present. Half-configured hours —
+ * days but no times, or times but no days — would produce either an incomplete
+ * schema node or a sentence with a gap in it, and an office that has not been
+ * filled in yet should simply show nothing.
+ */
+export function officeHours(office: {
+  openDays?: string[] | null;
+  opensAt?: string | null;
+  closesAt?: string | null;
+}): { days: string[]; opens: string; closes: string; label: string } | null {
+  const opens = toClockTime(office.opensAt);
+  const closes = toClockTime(office.closesAt);
+  if (!opens || !closes) return null;
+
+  const days = (office.openDays ?? [])
+    .map((day) => String(day).trim())
+    // Guard against a typo in the CMS reaching the markup: schema.org only
+    // recognises these seven names, and an invented one invalidates the node.
+    .filter((day) => DAY_ORDER.includes(day))
+    .sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b));
+  if (!days.length) return null;
+
+  // "Sunday to Thursday" when the listed days run consecutively in week order,
+  // otherwise the days themselves — a Sunday/Tuesday/Thursday office should not
+  // be described as opening Sunday to Thursday.
+  const first = DAY_ORDER.indexOf(days[0]);
+  const consecutive = days.every((day, i) => DAY_ORDER.indexOf(day) === first + i);
+  const label =
+    days.length > 1 && consecutive
+      ? `${days[0]} to ${days[days.length - 1]}, ${opens} to ${closes}`
+      : `${days.join(", ")}, ${opens} to ${closes}`;
+
+  return { days, opens, closes, label };
 }
 
 /**

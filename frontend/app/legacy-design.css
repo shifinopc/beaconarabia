@@ -3532,6 +3532,19 @@ option {
   margin-bottom: 10px;
 }
 
+/* Opening hours sit under the address, in the same measure as the rest of the
+   office details. */
+.officeHours {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.officeHours strong {
+  font-weight: 600;
+  color: #024a04;
+}
+
 .officePhones,
 .officeOtherList {
   list-style: none;
