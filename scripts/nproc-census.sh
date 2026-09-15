@@ -96,7 +96,7 @@ echo
 # More than one instance per app is the known failure on this host: Passenger
 # fails to reap the old process after a restart, and each leftover keeps its
 # full thread pool.
-(( node_frontend > 2 )) && echo "  !! $node_frontend frontend processes — likely leftovers from a graceful restart"
-(( node_cms > 2 ))      && echo "  !! $node_cms CMS processes — likely leftovers from a graceful restart"
-echo "  (an lsnode wrapper plus its node child counts as 2 per app)"
+(( node_frontend > 1 )) && echo "  !! $node_frontend frontend processes — likely leftovers from a graceful restart"
+(( node_cms > 1 ))      && echo "  !! $node_cms CMS processes — likely leftovers from a graceful restart"
+echo "  (healthy: exactly one lsnode process per app)"
 echo
