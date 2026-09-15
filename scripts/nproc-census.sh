@@ -13,6 +13,7 @@
 # Usage:
 #   bash ~/scripts/nproc-census.sh            # print a report
 #   bash ~/scripts/nproc-census.sh --log      # append one line to the log
+#   bash ~/scripts/nproc-census.sh --threads PID   # what one process's threads are
 #
 # For a history, cron the --log form every 10 minutes (cPanel -> Cron Jobs):
 #   */10 * * * * bash $HOME/scripts/nproc-census.sh --log
@@ -20,6 +21,21 @@
 
 LOG="$HOME/logs/nproc-census.log"
 LIMIT=100
+
+# --threads PID: name every thread in one process, grouped, to see what a big
+# thread count is made of (V8 workers, libuv pool, app worker threads...).
+if [[ $1 == "--threads" ]]; then
+  declare -A seen
+  for t in /proc/"$2"/task/*; do
+    read -r name 2>/dev/null < "$t/comm" || continue
+    seen[$name]=$(( ${seen[$name]:-0} + 1 ))
+  done
+  echo
+  echo "  Threads in PID $2 by name:"
+  for name in "${!seen[@]}"; do printf "  %5s  %s\n" "${seen[$name]}" "$name"; done
+  echo
+  exit 0
+fi
 
 total=0
 rows=()
