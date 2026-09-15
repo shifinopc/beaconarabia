@@ -17,10 +17,12 @@ an entry point for that, not something used in development.
 **0. Check for duplicate processes BEFORE and AFTER every deploy.**
 
 ```bash
-ps -u beaconarabia -o pid,etime,cmd | grep lsnode
+bash ~/scripts/nproc-census.sh
 ```
 
-Expect exactly one `frontend` and one `cms.beaconarabia.com`. Passenger on this
+Expect exactly one `frontend` and one `cms.beaconarabia.com` Node process, and a
+thread total well under 100. The script is fork-free, so it still runs when the
+account is at its limit and `ps` cannot. Passenger on this
 host regularly fails to reap the previous instance on restart, leaving two
 running — one 22 hours old alongside a fresh one, in the worst case observed.
 
@@ -44,14 +46,13 @@ team has also cleared these manually on request.
   out to esbuild, and esbuild segfaults under CloudLinux's CageFS (`SIGSEGV`
   from `esbuild --version`).
 - The **frontend** dies because CloudLinux's LVE layer refuses to fork:
-  `spawn ... EAGAIN`, or `OS can't spawn worker thread` from inside Rust. This
-  is *not* a process-count problem — it happens with 5 processes running and
-  `ulimit -u unlimited`, and it happens even after forcing a single worker
-  (`experimental.cpus: 1`, which the config supports via `NEXT_BUILD_CPUS`).
-  The binding constraint is the LVE memory cap; a webpack build wants more than
-  the plan allows. Check cPanel → Resource Usage for `MEM`/`NPROC` faults at
-  build times, and ask Verpex to raise the limit if you want on-server builds
-  back.
+  `spawn ... EAGAIN`, or `OS can't spawn worker thread` from inside Rust.
+  An earlier version of this note said this was *not* a process-count problem,
+  because only 5 processes were visible and `ulimit -u` reports unlimited. That
+  was wrong. CloudLinux enforces NPROC separately from `ulimit`, and it counts
+  **threads**, not processes — Resource Usage shows a hard ceiling of 100 tasks
+  on this account. Five Node processes with twenty-odd threads each is the whole
+  budget. A webpack build's worker threads push straight past it.
 
 Note that `taskset` does **not** help: it constrains CPU affinity, but
 `os.cpus()` still reports every core, so Next sizes its worker pool the same.
@@ -152,7 +153,8 @@ tar -czf ../deploy/beacon-next-build.tar.gz --exclude='.next/cache' .next public
 Excluding `.next/cache` matters: it is ~119 MB of build cache with no runtime
 purpose, against ~9.5 MB for everything else.
 
-On the server:
+On the server — **stop the frontend app in cPanel first** (Setup Node.js App →
+beaconarabia.com → Stop App), then:
 
 ```bash
 cd ~/frontend
@@ -161,8 +163,20 @@ mv .next .next.old                        # rule 3
 tar -xzf beacon-next-build.tar.gz
 chmod -R u+rwX,go+rX .next public         # rule 2
 find .next -type d ! -perm -u+x | wc -l   # must print 0
-ls .next/prerender-manifest.json && touch tmp/restart.txt
+ls .next/prerender-manifest.json          # must exist before starting
 ```
+
+Then **Start App** in cPanel.
+
+**Never `touch tmp/restart.txt`.** It asks for a graceful restart, which starts
+the new Node process while the old one is still alive, and on this host the old
+one does not reliably exit. Each deploy can leave a full set of idle threads
+behind. The account's NPROC ceiling is 100 *tasks* — CloudLinux counts every
+thread, not just processes — and one Node app is roughly 20–25 of them. On
+15 September the account sat pinned at 100/100 for eleven straight hours with
+CPU at 0% and only 5 entry processes: nothing was busy, the budget was simply
+full of leftovers, and the frontend 503'd because it could not fork. Stop, then
+start, frees the old threads before the new process claims any.
 
 **Clear `.next.old` first.** If it survives from the previous deploy, `mv .next
 .next.old` does not replace it — it moves `.next` *inside* it, and fails with
@@ -218,13 +232,17 @@ The trade-off is that packages needing a postinstall may be left incomplete —
 
 Then:
 
+Stop the CMS app in cPanel first, then:
+
 ```bash
 cd ~/cms.beaconarabia.com
+rm -rf dist.old
 mv dist dist.old                    # rule 3
 tar -xzf beacon-cms-dist.tar.gz
 chmod -R u+rwX,go+rX dist           # rule 2
-touch tmp/restart.txt
 ```
+
+Then Start App. Same reason as the frontend: no `touch tmp/restart.txt`.
 
 Start the frontend app again, then verify the API is serving, not just the admin
 panel — a permissions problem shows up as `/admin` working while every content
@@ -384,8 +402,10 @@ before assuming a caching issue.
 
 Both apps at once is what has caused the most trouble. One at a time:
 
-1. `ps -u beaconarabia -o pid,etime,cmd | grep lsnode` — kill duplicates first.
-2. Deploy the **frontend** (extract, `chmod`, `touch tmp/restart.txt`), verify.
+1. Check headroom: cPanel → Resource Usage → Current usage. NPROC should be
+   well under 100 before you start. If it is not, stop both apps, run
+   `scripts/nproc-census.sh` to see what is holding it, and clear it first.
+2. Deploy the **frontend** (Stop App, extract, `chmod`, Start App), verify.
 3. Deploy the **CMS**, with the frontend app **stopped** if `npm install` is
    needed. Start the frontend again afterwards.
 4. Re-check for duplicates — both apps just restarted.
