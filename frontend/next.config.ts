@@ -54,7 +54,11 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
  */
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+  // Clarity is a wildcard here for the same reason it is in connect-src:
+  // www.clarity.ms serves the tag, which then loads the library itself from
+  // scripts.clarity.ms. Naming only www blocked that second script outright,
+  // so Clarity recorded nothing between 15 and 16 Sep 2026.
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.clarity.ms https://static.cloudflareinsights.com https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
   // The CMS serves every content image; data:/blob: cover inlined SVGs.
   "img-src 'self' data: blob: https://cms.beaconarabia.com https://www.googletagmanager.com https://*.google-analytics.com https://*.clarity.ms https://c.bing.com",
