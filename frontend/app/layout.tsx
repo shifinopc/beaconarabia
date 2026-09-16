@@ -6,6 +6,9 @@ import { validateEnv } from "@/lib/env";
 import { loadSiteInfo } from "@/lib/site";
 import { organisationSchema, websiteSchema, jsonLdProps } from "@/lib/structured-data";
 import Analytics from "@/components/Analytics";
+import GoogleTagManager, {
+  GoogleTagManagerNoScript,
+} from "@/components/GoogleTagManager";
 import Clarity from "@/components/Clarity";
 
 // Runs once at module load, i.e. when the server boots — so a production
@@ -91,10 +94,15 @@ export default async function RootLayout({
         suppressed at exactly the element affected.
       */}
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        {/* Google’s snippet puts this immediately after <body>, before
+            anything else, so it is present even in the markup a
+            JavaScript-less client receives. */}
+        <GoogleTagManagerNoScript />
         {/* Site-wide identity, emitted once. Page-level schemas (breadcrumbs,
             articles) reference the organisation by @id rather than repeating
             it. */}
         <script {...jsonLdProps([organisationSchema(site), websiteSchema()])} />
+        <GoogleTagManager />
         <Analytics />
         <Clarity />
         {children}

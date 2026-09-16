@@ -21,6 +21,12 @@ import Script from "next/script";
  * has no effect on what the user sees.
  *
  * Development is excluded so local page views don't contaminate the reports.
+ *
+ * TEMPORARY OVERLAP (16 Sep 2026): the same GA4 property is now also served
+ * through Tag Manager (see GoogleTagManager.tsx). While both are live a visit
+ * can be counted twice, so this component is to be deleted — along with its
+ * <Analytics /> line in app/layout.tsx — as soon as GA4 Realtime and GTM
+ * Preview confirm the container is reporting. Days, not weeks.
  */
 
 const MEASUREMENT_ID =

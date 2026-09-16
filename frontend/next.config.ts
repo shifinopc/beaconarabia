@@ -57,16 +57,23 @@ const contentSecurityPolicy = [
   "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://static.cloudflareinsights.com https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
   // The CMS serves every content image; data:/blob: cover inlined SVGs.
-  "img-src 'self' data: blob: https://cms.beaconarabia.com https://www.googletagmanager.com https://*.clarity.ms https://c.bing.com",
+  "img-src 'self' data: blob: https://cms.beaconarabia.com https://www.googletagmanager.com https://*.google-analytics.com https://*.clarity.ms https://c.bing.com",
   "font-src 'self' data:",
   /**
    * GA and Cloudflare analytics beacons, plus the CMS for form submission.
+   *
+   * GA4 loaded through Tag Manager does not post to one fixed host: it uses a
+   * regional collector (region1.google-analytics.com and siblings) chosen at
+   * runtime, and googletagmanager.com itself for the container's own config
+   * requests. Wildcards cover both. Naming only www.google-analytics.com, as
+   * this did while gtag.js was loaded directly, would drop those hits
+   * silently — a CSP violation is invisible in the analytics reports.
    *
    * Clarity is a wildcard because it does not use one host: the tag comes
    * from www.clarity.ms and uploads go to whichever regional subdomain it
    * picks at runtime. c.bing.com is the same vendor's collection endpoint.
    */
-  "connect-src 'self' https://cms.beaconarabia.com https://www.google-analytics.com https://*.clarity.ms https://c.bing.com https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+  "connect-src 'self' https://cms.beaconarabia.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.clarity.ms https://c.bing.com https://static.cloudflareinsights.com https://challenges.cloudflare.com",
   /**
    * Turnstile is the only thing this site frames, and it frames itself: the
    * widget injects an iframe from challenges.cloudflare.com.
@@ -78,7 +85,8 @@ const contentSecurityPolicy = [
    * a bot-protection outage that looks like a broken form. Allowing one known
    * origin to be framed costs nothing while the widget is off.
    */
-  "frame-src https://challenges.cloudflare.com",
+  // googletagmanager.com is framed by the GTM <noscript> fallback only.
+  "frame-src https://challenges.cloudflare.com https://www.googletagmanager.com",
   "frame-ancestors 'self'",
   "object-src 'none'",
   "base-uri 'self'",
