@@ -5,8 +5,8 @@ import { REGIONS, regionUrl } from "@/lib/regions";
 /**
  * Drafted 2026-08-08 from what the site actually does: three enquiry forms
  * (contact, newsletter, popup) storing name/email/phone/message in the CMS,
- * Google Analytics 4, Cloudflare in front of everything, and email
- * notifications to the team. If any of that changes, this page must too.
+ * Google Analytics 4, Microsoft Clarity (session replay, added 2026-09-16),
+ * Cloudflare in front of everything, and email notifications to the team. If any of that changes, this page must too.
  * Reviewed content, not boilerplate — but it is not legal advice, and a
  * qualified review before relying on it is the owner's responsibility.
  */
@@ -41,6 +41,7 @@ const SECTIONS: LegalSection[] = [
     heading: "What we collect automatically",
     body: [
       "We use Google Analytics to understand how the site is used — pages visited, approximate location at city level, device and browser type. This relies on cookies and similar identifiers. Google's own privacy policy applies to its processing.",
+      "We also use Microsoft Clarity, which records how pages are used — clicks, scrolling and mouse movement — and can replay a visit as an anonymised session. It masks the text you type into forms, so what you enter in a field is not visible in a recording; the details you submit reach us through the form itself, as described above. Microsoft's own privacy policy applies to its processing.",
       "Our infrastructure providers (including Cloudflare, which sits in front of this site) log requests — IP address, user agent, pages requested — for security and performance. These logs are not used to identify you.",
     ],
   },

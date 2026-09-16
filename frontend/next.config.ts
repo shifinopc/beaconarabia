@@ -34,8 +34,8 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
  * Content-Security-Policy.
  *
  * Built from an audit of what the live pages actually request, not from a
- * template: the CMS media host, Google Analytics, Cloudflare's analytics beacon,
- * and nothing else. Anything an injected script would want to reach — an
+ * template: the CMS media host, Google Analytics, Microsoft Clarity,
+ * Cloudflare's analytics beacon, and nothing else. Anything an injected script would want to reach — an
  * attacker's own domain, an arbitrary endpoint to exfiltrate a form submission
  * to — is not on this list, which is the point.
  *
@@ -54,13 +54,19 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
  */
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://static.cloudflareinsights.com https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
   // The CMS serves every content image; data:/blob: cover inlined SVGs.
-  "img-src 'self' data: blob: https://cms.beaconarabia.com https://www.googletagmanager.com",
+  "img-src 'self' data: blob: https://cms.beaconarabia.com https://www.googletagmanager.com https://*.clarity.ms https://c.bing.com",
   "font-src 'self' data:",
-  // GA and Cloudflare analytics beacons, plus the CMS for form submission.
-  "connect-src 'self' https://cms.beaconarabia.com https://www.google-analytics.com https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+  /**
+   * GA and Cloudflare analytics beacons, plus the CMS for form submission.
+   *
+   * Clarity is a wildcard because it does not use one host: the tag comes
+   * from www.clarity.ms and uploads go to whichever regional subdomain it
+   * picks at runtime. c.bing.com is the same vendor's collection endpoint.
+   */
+  "connect-src 'self' https://cms.beaconarabia.com https://www.google-analytics.com https://*.clarity.ms https://c.bing.com https://static.cloudflareinsights.com https://challenges.cloudflare.com",
   /**
    * Turnstile is the only thing this site frames, and it frames itself: the
    * widget injects an iframe from challenges.cloudflare.com.

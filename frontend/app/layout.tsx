@@ -6,6 +6,7 @@ import { validateEnv } from "@/lib/env";
 import { loadSiteInfo } from "@/lib/site";
 import { organisationSchema, websiteSchema, jsonLdProps } from "@/lib/structured-data";
 import Analytics from "@/components/Analytics";
+import Clarity from "@/components/Clarity";
 
 // Runs once at module load, i.e. when the server boots — so a production
 // deployment missing STRAPI_URL or NEXT_PUBLIC_SITE_URL fails immediately and
@@ -95,6 +96,7 @@ export default async function RootLayout({
             it. */}
         <script {...jsonLdProps([organisationSchema(site), websiteSchema()])} />
         <Analytics />
+        <Clarity />
         {children}
       </body>
     </html>
