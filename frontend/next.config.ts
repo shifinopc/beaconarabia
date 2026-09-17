@@ -124,6 +124,36 @@ const securityHeaders = [
   },
 ];
 
+/**
+ * Region of every post the old sites published under /pages/blog/<slug>, taken
+ * from the CMS on 17 Sep 2026. The slugs were kept in the migration; only the
+ * path changed. Posts created since then never had a /pages/ URL, so this list
+ * does not need to grow.
+ */
+const LEGACY_BLOG_REGION: Record<string, "global" | "ae" | "sa"> = {
+  "oman-vision-2040": "global",
+  "understanding-free-zones-in-qatar-benefits-for-foreign-investors": "global",
+  "venture-capital-driven-growth-in-the-gcc": "global",
+  "business-incorporation": "ae",
+  "the-e-commerce-boom-in-the-uae": "ae",
+  "how-technology-is-transforming-business-operations-in-the-uae": "ae",
+  "dubais-ambitious-2025-2027-budget": "ae",
+  "freezone-vs-mainland": "ae",
+  "saudi-arabia-s-booming-events-industry": "sa",
+  "navigating-saudi-arabia-s-market-opportunities-and-updates-for-2025": "sa",
+  "why-auditing-and-accounting-are-vital-for-businesses-in-saudi-arabia": "sa",
+  "saudi-arabia-s-growing-business-sector": "sa",
+  "is-the-line-project-in-neom-reduced": "sa",
+  "the-role-of-pro-and-gro-services-in-saudi-business-setup-for-foreign-investors": "sa",
+  "top-benefits-of-incorporating-your-business-in-saudi-arabia": "sa",
+  "riyadh-to-be-among-top-15-fastest-growing-cities-by-2033": "sa",
+  "how-to-choose-the-right-business-structure-in-saudi-arabia": "sa",
+  "how-e-commerce-is-transforming-the-retail-landscape": "sa",
+  "updated-commercial-registration-and-trade-name-laws": "sa",
+  "transforming-the-economy-beyondoil": "sa",
+  "premium-residency-in-ksa": "sa",
+};
+
 const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
@@ -177,6 +207,70 @@ const nextConfig: NextConfig = {
         destination: "https://beaconarabia.com/:path*",
         permanent: true,
       },
+
+      /**
+       * The old regional sites. ksa. and uae.beaconarabia.com do not resolve
+       * today, so these rules do nothing until Cloudflare has proxied DNS
+       * records for them pointing at this app. They are here so that adding
+       * those records is the only step left. Search Console still credits
+       * these hostnames with real traffic (ksa. home alone: 12k impressions,
+       * 138 clicks), all of it currently lost.
+       */
+      ...(["ksa", "uae"] as const).flatMap((sub) => {
+        const region = sub === "ksa" ? "sa" : "ae";
+        const hosts = [`${sub}.beaconarabia.com`, `www.${sub}.beaconarabia.com`];
+        const pages: [string, string][] = [
+          ["/pages/About", `/${region}/about`],
+          ["/pages/Services", `/${region}/services`],
+          ["/pages/Contact", `/${region}/contact`],
+          ["/pages/Careers", `/${region}/careers`],
+          ["/pages/Partners", `/${region}/partners`],
+          ["/pages/blog", `/${region}/blog`],
+          ["/pages/WhySaudi", "/sa/why-saudi"],
+          ["/pages/WhyDubai", "/ae/why-dubai"],
+          ["/pages/blog/:slug", `/${region}/blog/:slug`],
+          ["/:path*", `/${region}`],
+        ];
+        return hosts.flatMap((host) =>
+          pages.map(([source, path]) => ({
+            source,
+            has: [{ type: "host" as const, value: host }],
+            destination: `https://beaconarabia.com${path}`,
+            permanent: true,
+          })),
+        );
+      }),
+
+      /**
+       * Plain http on the apex answered 200 instead of moving to https (www
+       * was already covered by the rule above). Cloudflare terminates TLS, so
+       * the scheme the origin sees says nothing about the visitor's; the
+       * `cf-visitor` header carries the visitor's scheme. Matching `"http"`
+       * with both quotes does not match `"https"`. Requests that reach the
+       * origin without Cloudflare have no such header and are left alone,
+       * which is what keeps this from looping.
+       */
+      {
+        source: "/:path*",
+        has: [{ type: "header", key: "cf-visitor", value: '.*"scheme":"http".*' }],
+        destination: "https://beaconarabia.com/:path*",
+        permanent: true,
+      },
+
+      /**
+       * Old blog URLs. The catch-all below used to send every one of these to
+       * the homepage, including /pages/blog/oman-vision-2040 (47k impressions
+       * in Search Console). Each post still exists under the same slug, now
+       * inside its region's tree, so send it to the post itself.
+       * neom-redefining-business-in-saudi was not migrated; its nearest
+       * surviving page is the Saudi blog index.
+       */
+      ...Object.entries(LEGACY_BLOG_REGION).map(([slug, region]) => ({
+        source: `/pages/blog/${slug}`,
+        destination: region === "global" ? `/blog/${slug}` : `/${region}/blog/${slug}`,
+        permanent: true,
+      })),
+      { source: "/pages/blog/neom-redefining-business-in-saudi", destination: "/sa/blog", permanent: true },
 
       // Global site.
       { source: "/pages/About", destination: "/about", permanent: true },
