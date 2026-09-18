@@ -147,11 +147,13 @@ Package and upload:
 
 ```bash
 cd /m/Projects/beacon/beacon-platform/frontend
-tar -czf ../deploy/beacon-next-build.tar.gz --exclude='.next/cache' .next public/og-default.png
+tar -czf ../deploy/beacon-next-build.tar.gz --exclude='.next/cache' --exclude='.next/dev' --exclude='*.map' .next public/og-default.png
 ```
 
-Excluding `.next/cache` matters: it is ~119 MB of build cache with no runtime
-purpose, against ~9.5 MB for everything else.
+The exclusions matter. `.next/cache` is ~119 MB of build cache and `.next/dev`
+is ~110 MB left behind by any local `next dev` session; neither has a runtime
+purpose. With them the archive is ~70 MB, without them ~3–4 MB — if the
+archive is much over 5 MB, something extra got in.
 
 On the server — **stop the frontend app in cPanel first** (Setup Node.js App →
 beaconarabia.com → Stop App), then:
@@ -311,12 +313,15 @@ To confirm after a deploy:
 curl -s https://beaconarabia.com/ | grep -o '/_next/image' | wc -l   # must be 0
 ```
 
-**Blog articles must stay prerendered.** Both `/blog/[slug]` and
-`/[region]/blog/[slug]` declare `generateStaticParams` and `dynamicParams =
-false`. Without them the routes render per request, which needs the server to
-reach the CMS mid-response — and it cannot, so every article timed out while
-every other page served in ~130ms. A new article therefore needs a rebuild to
-appear.
+**Blog articles are prerendered, and new ones appear without a rebuild.**
+Both `/blog/[slug]` and `/[region]/blog/[slug]` declare `generateStaticParams`,
+so every article that exists at build time ships as static HTML. They also set
+`dynamicParams = true` (since 8 Sep 2026): an article published in the CMS
+after the last build is rendered on its first request, then cached and
+revalidated like the rest. Before that change such an article returned 404
+until the next deploy. The same applies to service and office pages. An
+unknown slug still returns 404 — the page calls `notFound()` when the CMS has
+no such entry.
 
 ---
 
