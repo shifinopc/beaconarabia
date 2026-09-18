@@ -363,6 +363,19 @@ reference those filenames, so both must be restored together.
   entirely and serve one region's redirect to everybody.
 - Rate limiting and `clientIp()` both prefer `CF-Connecting-IP`, which the edge
   sets itself; that only works while the domain is proxied (orange cloud).
+- **Always Use HTTPS is on** (SSL/TLS → Edge Certificates, since 18 Sep 2026).
+  Cloudflare answers every `http://` request with a 301 itself, so nothing
+  depends on the origin's port 80 — which stopped responding that day. The
+  `cf-visitor` rule in `next.config.ts` is now a fallback; it cannot loop,
+  because it only fires for a visitor scheme of plain `http`.
+- **Old regional hosts.** `ksa` and `uae` are proxied A records to the origin
+  (190.92.174.37), and exist in cPanel → Domains with document root
+  `public_html`, so the same Node app receives them and the host-based rules in
+  `next.config.ts` redirect them into `/sa` and `/ae`. `www.ksa` / `www.uae`
+  are not set up: HTTPS for a second-level subdomain needs Cloudflare's paid
+  Advanced Certificate. Test with
+  `curl -sI https://ksa.beaconarabia.com/pages/Contact` (expect 308 to
+  `/sa/contact`).
 
 **Geo-routing cannot be tested by sending your own `CF-IPCountry` header** —
 Cloudflare overwrites it with the real value, which is the point of it. To check
@@ -399,6 +412,7 @@ assigned you (`loc=`), which is what the proxy will actually see.
 | CMS `dist` archive is ~96 KB not ~14 MB | Packaged while `strapi develop` was running; it wipes `dist/build` |
 | `unzip` warns about backslashes; files named `dist\build\…` | Archive made with PowerShell `Compress-Archive` — use `tar` (rule 4) |
 | `/ae`, `/sa` and their section pages 404 after a CMS publish, `NoFallbackError` in the log; detail pages fine | A route with `dynamicParams = false` cannot regenerate after `/api/revalidate`. Every `[region]` route must use `true` and call `notFound()` itself. A restart clears it until the next publish |
+| Two `lsnode (frontend)` processes with the same parent, the second started minutes after a deploy with no restart | LiteSpeed starting a second app instance on its own under concurrent requests — not a deploy leftover. Each costs ~39 threads, so two frontends plus the CMS sits near the NPROC limit of 100. Avoid bursts of parallel requests (e.g. scripted checks) and ask the host whether the per-app instance count can be capped at 1 |
 
 Several of these are dangerous specifically because the site *looks* merely
 stale rather than broken: the execute-bit problem, the incomplete build, and
