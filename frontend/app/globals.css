@@ -93,6 +93,21 @@
   }
 
   /*
+   * Article and service-page section headings on phones.
+   *
+   * legacy-design.css sizes every h2 at 5.8vw !important below 600px, meant for
+   * the homepage banners. Blog and service sections became real <h2>s on
+   * 18 Sep 2026 and must keep their original 4.8vw. An !important rule outside
+   * this layer cannot beat one inside it — for important declarations the
+   * layer order reverses — so this sits here, winning on specificity.
+   */
+  @media (max-width: 600px) {
+    h2.articleHeading {
+      font-size: 4.8vw !important;
+    }
+  }
+
+  /*
    * Consistent breathing room above the footer on every page.
    *
    * The legacy design left whatever section came last butting straight against

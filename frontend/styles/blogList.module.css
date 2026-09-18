@@ -155,6 +155,12 @@
   font-size: 2vw;
   margin-bottom: 1.984126984126984vw;
   font-weight: 600;
+  /* Now an <h2>. legacy-design.css styles every bare h2 on phones for the
+     homepage's dark banners: white, centred, 140% line height. Without these
+     the article headings would turn white-on-white below 600px. */
+  color: inherit;
+  text-align: inherit;
+  line-height: inherit;
 }
 
 .link {
@@ -329,6 +335,8 @@
   }
 
   .mainHeading {
+    /* On phones below 600px the legacy h2 rule's !important size wins over
+       this; the override lives in globals.css, inside that same layer. */
     font-size: 4.8vw;
     margin-bottom: 3.2vw;
     font-weight: 600;

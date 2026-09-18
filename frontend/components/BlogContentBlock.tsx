@@ -130,12 +130,17 @@ export default function BlogContentBlock({ block }: { block: ContentBlock }) {
 
   return (
     <div className={styles.cardContainer}>
+      {/* Real heading elements, not styled <div>s. The page title is the
+          <h1>; these give every article and service page an H2/H3 outline
+          that search engines and screen readers can follow. Until 18 Sep 2026
+          they were <div>s, so no blog or service page had any heading below
+          its title. The look is unchanged — see .mainHeading/.subHeading. */}
       {block.type === "mainHeading" && block.content && (
-        <div className={styles.mainHeading}>{block.content}</div>
+        <h2 className={`${styles.mainHeading} articleHeading`}>{block.content}</h2>
       )}
 
       {block.type === "subheading" && block.content && (
-        <div className={styles.subHeading}>{block.content}</div>
+        <h3 className={styles.subHeading}>{block.content}</h3>
       )}
 
       {block.type === "content" && block.content && (
