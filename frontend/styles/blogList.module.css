@@ -171,6 +171,27 @@
   line-height: inherit;
 }
 
+/* Blog index heading + intro. The heading keeps personalBlog's .text2 look;
+   only its bottom margin shrinks so the intro sits under it, not a card-gap
+   away. */
+.introHeading {
+  margin-bottom: 1.3227513227513228vw;
+}
+
+.intro {
+  max-width: 52vw;
+  margin: 0 auto 4.62962962962963vw;
+  text-align: center;
+  font-size: 1.1904761904761905vw;
+  line-height: 1.6;
+  color: #3b3d45;
+}
+
+.intro a {
+  color: #13670b;
+  text-decoration: underline;
+}
+
 .link {
   color: #104add;
   margin-bottom: 0;
@@ -193,7 +214,11 @@
 
 @media only screen and (max-width: 767px) {
   .blogsMainInnerPage {
-    margin: 7.2751322751322745vw 0;
+    /* The phone header is fixed and 75px tall; with only the desktop margin the
+       blog index started underneath it, hiding the "Blogs" label and the first
+       line of the heading. 80px matches what article pages (.bgContainer)
+       already clear it by. */
+    margin: calc(80px + 7.2751322751322745vw) 0 7.2751322751322745vw;
   }
 
   .top110Margin {
@@ -345,6 +370,16 @@
   .allBlogsContainerTitle {
     font-size: 3.733333333333334vw;
     margin-bottom: 0;
+  }
+
+  .introHeading {
+    margin-bottom: 3.2vw;
+  }
+
+  .intro {
+    max-width: none;
+    margin-bottom: 8vw;
+    font-size: 3.733333333333334vw;
   }
 
   .mainHeading {

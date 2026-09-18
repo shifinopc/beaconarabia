@@ -107,7 +107,28 @@ export function regionUrl(region: Region, path = ""): string {
  * canonical, which invites keyword cannibalisation. Emitting both here tells
  * Google these are regional variants rather than duplicates.
  */
+/**
+ * Sections whose UAE and Saudi copies canonicalise to the global page.
+ *
+ * Careers is here because the regional pages are duplicates, not editions:
+ * every job in the CMS is global (all five are in Doha), so /ae/careers and
+ * /sa/careers list the same roles as /careers with only the title changed —
+ * 89-92% identical text, which Search Console reported as "Google chose
+ * different canonical". Pointing their canonical at /careers says so honestly
+ * and stops the three competing. The pages stay up for navigation.
+ *
+ * Remove "careers" from this set once regional roles exist (the Job type has a
+ * region field): the pages then differ, and self-canonicals with hreflang are
+ * right again.
+ */
+export const GLOBAL_CANONICAL_PAGES: ReadonlySet<string> = new Set(["careers"]);
+
 export function alternatesFor(region: Region, path = "") {
+  // No hreflang set here: alternates must name canonical URLs, and the regional
+  // copies of these pages are not canonical.
+  if (GLOBAL_CANONICAL_PAGES.has(path)) {
+    return { canonical: regionUrl(REGIONS.global, path) };
+  }
   const languages: Record<string, string> = {};
   for (const key of REGION_KEYS) {
     const r = REGIONS[key];

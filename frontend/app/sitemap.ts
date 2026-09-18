@@ -1,5 +1,12 @@
 import type { MetadataRoute } from "next";
-import { REGIONS, REGION_KEYS, WHY_PAGES, SITE_URL, regionUrl } from "@/lib/regions";
+import {
+  GLOBAL_CANONICAL_PAGES,
+  REGIONS,
+  REGION_KEYS,
+  WHY_PAGES,
+  SITE_URL,
+  regionUrl,
+} from "@/lib/regions";
 import { postDates } from "@/lib/post-dates";
 import {
   getAllPosts,
@@ -36,16 +43,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticEntries = REGION_KEYS.flatMap((key) => {
     const region = REGIONS[key];
 
-    const shared = SHARED_PATHS.map((path) => ({
+    // A page whose regional copies canonicalise to the global one is listed
+    // once, globally, without hreflang — a sitemap should only name canonical
+    // URLs. See GLOBAL_CANONICAL_PAGES.
+    const shared = SHARED_PATHS.filter(
+      (path) => key === "global" || !GLOBAL_CANONICAL_PAGES.has(path),
+    ).map((path) => ({
       url: regionUrl(region, path),
       lastModified,
       changeFrequency: "monthly" as const,
       priority: path === "" ? 1 : 0.8,
-      alternates: {
-        languages: Object.fromEntries(
-          REGION_KEYS.map((k) => [REGIONS[k].hreflang, regionUrl(REGIONS[k], path)]),
-        ),
-      },
+      ...(GLOBAL_CANONICAL_PAGES.has(path)
+        ? {}
+        : {
+            alternates: {
+              languages: Object.fromEntries(
+                REGION_KEYS.map((k) => [REGIONS[k].hreflang, regionUrl(REGIONS[k], path)]),
+              ),
+            },
+          }),
     }));
 
     // "Why Dubai" / "Why Saudi" exist in one region each, so they carry no
