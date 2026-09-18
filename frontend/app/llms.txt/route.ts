@@ -8,6 +8,7 @@ import {
   servicePath,
 } from "@/lib/strapi";
 import { titleCaseCity } from "@/lib/structured-data";
+import { loadSiteInfo } from "@/lib/site";
 
 /**
  * /llms.txt — a map of this site for AI assistants.
@@ -37,8 +38,51 @@ const REGION_LABEL: Record<string, string> = {
   sa: "Saudi Arabia",
 };
 
+type Office = Awaited<ReturnType<typeof getOffices>>[number];
+
+const COUNTRY: Record<string, { name: string; order: number }> = {
+  ksa: { name: "Saudi Arabia", order: 0 },
+  uae: { name: "the UAE", order: 1 },
+  qatar: { name: "Qatar", order: 2 },
+  bahrain: { name: "Bahrain", order: 3 },
+};
+
+/** Countries that have an office, in a fixed order. */
+function officeCountries(offices: Office[]): string[] {
+  return [...new Set(offices.map((o) => o.country))]
+    .filter((c) => COUNTRY[c])
+    .sort((a, b) => COUNTRY[a].order - COUNTRY[b].order);
+}
+
+/**
+ * "Saudi Arabia (Riyadh, Jeddah, Dammam and Jazan), the UAE (Dubai), Qatar and
+ * Bahrain". Where the CMS city is just the country name (Qatar, Bahrain) the
+ * country stands alone rather than repeating itself in brackets.
+ */
+function officeSentence(offices: Office[]): string {
+  const parts = officeCountries(offices).map((c) => {
+    const country = COUNTRY[c].name;
+    const cities = offices
+      .filter((o) => o.country === c)
+      .map((o) => titleCaseCity(o.city))
+      .filter((city) => city.toLowerCase() !== country.replace(/^the /, "").toLowerCase());
+    return cities.length ? `${country} (${joinAnd(cities)})` : country;
+  });
+  return joinAnd(parts);
+}
+
+function marketList(offices: Office[]): string {
+  return joinAnd(officeCountries(offices).map((c) => COUNTRY[c].name.replace(/^the /, "")));
+}
+
+function joinAnd(items: string[]): string {
+  return items.length <= 1 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
 /** Trims a CMS summary to one clean line for a link description. */
-function oneLine(text: string | undefined, max = 140): string {
+// 160 matches the CMS's length limit for a service summary, so a summary is
+// never cut off mid-word with an ellipsis.
+function oneLine(text: string | undefined, max = 160): string {
   if (!text) return "";
   const flat = text.replace(/\s+/g, " ").trim();
   return flat.length <= max ? flat : `${flat.slice(0, max - 1).trimEnd()}…`;
@@ -57,21 +101,26 @@ export async function GET() {
    * apart — see lib/strapi.ts — so a genuinely empty collection still renders
    * empty, and only an unreachable CMS propagates.
    */
-  const [services, offices, posts] = await Promise.all([
+  const [services, offices, posts, site] = await Promise.all([
     getAllServices(),
     getOffices(),
     getAllPosts(),
+    loadSiteInfo(),
   ]);
 
   const lines: string[] = [];
 
   lines.push("# Beacon");
   lines.push("");
+  // The office list comes from the Offices collection, not a hardcoded string:
+  // the earlier sentence named five cities and missed the Qatar and Bahrain
+  // offices, and an assistant told two different things by this file and the
+  // /offices page has no way to know which is right.
   lines.push(
     "> Beacon Management Consultants is a business advisory firm operating across the Gulf. " +
       "We handle company formation, licensing, accounting, audit, taxation, technology and " +
       "digital marketing for companies entering or expanding in Saudi Arabia, the UAE, " +
-      "Bahrain and Qatar, from offices in Riyadh, Jeddah, Dammam, Jazan and Dubai.",
+      `Qatar and Bahrain, from offices in ${officeSentence(offices)}.`,
   );
   lines.push("");
   lines.push(
@@ -95,6 +144,24 @@ export async function GET() {
   lines.push(`- [Blog](${SITE_URL}/blog): guides and analysis on doing business in the GCC.`);
   lines.push(`- [UAE edition](${regionUrl(REGIONS.ae)}): business setup in the UAE.`);
   lines.push(`- [Saudi Arabia edition](${regionUrl(REGIONS.sa)}): market entry in the Kingdom.`);
+  lines.push("");
+
+  // One place stating the company's identity details, taken from the same CMS
+  // settings the footer and the Organization schema use, so every public
+  // description of the company says the same thing.
+  const profiles = site.social.filter((s) => !/whatsapp/i.test(s.name));
+  lines.push("## Company facts");
+  lines.push("");
+  lines.push(`- Legal name: ${site.copyrightHolder}`);
+  lines.push("- Brand: Beacon");
+  lines.push(`- Website: ${SITE_URL}`);
+  lines.push(`- Markets: ${marketList(offices)}`);
+  lines.push(`- Email: ${site.email}`);
+  if (site.phones.length) lines.push(`- Phone: ${site.phones.join(", ")}`);
+  if (site.whatsapp) lines.push(`- WhatsApp: ${site.whatsapp}`);
+  if (profiles.length) {
+    lines.push(`- Official profiles: ${profiles.map((p) => `[${p.name}](${p.href})`).join(", ")}`);
+  }
   lines.push("");
 
   // Global services only: the regional variants cover the same six offerings,
