@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { REGIONS, REGION_KEYS, WHY_PAGES, SITE_URL, regionUrl } from "@/lib/regions";
+import { postDates } from "@/lib/post-dates";
 import {
   getAllPosts,
   getAllServices,
@@ -136,15 +137,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPosts();
   const postEntries: MetadataRoute.Sitemap = posts
     .filter((post) => post.slug)
-    .map((post) => ({
-      url: `${SITE_URL}${postPath(post)}`,
-      lastModified: post.publishedAt ? new Date(post.publishedAt) : lastModified,
-      changeFrequency: "yearly" as const,
-      // Below the section pages: articles are the long tail, and an
-      // undifferentiated sitemap tells search engines nothing about which
-      // pages matter.
-      priority: 0.6,
-    }));
+    .map((post) => {
+      const { modified } = postDates(post);
+      return {
+        url: `${SITE_URL}${postPath(post)}`,
+        // The article's last change, the same date as dateModified in its
+        // schema. publishedAt moved on every republish.
+        lastModified: modified ? new Date(modified) : lastModified,
+        changeFrequency: "yearly" as const,
+        // Below the section pages: articles are the long tail, and an
+        // undifferentiated sitemap tells search engines nothing about which
+        // pages matter.
+        priority: 0.6,
+      };
+    });
 
   return [
     ...staticEntries,

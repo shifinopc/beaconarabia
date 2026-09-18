@@ -1,6 +1,7 @@
 import { SITE_URL, type Region } from "./regions";
 import type { SiteInfo } from "./site";
-import type { Post } from "./strapi";
+import { postPath, type Post } from "./strapi";
+import { postDates } from "./post-dates";
 
 /**
  * schema.org JSON-LD builders.
@@ -380,20 +381,25 @@ export function faqSchema(entries: { question: string; answer: string }[]): Json
 }
 
 export function articleSchema(post: Post, description: string, imageUrl?: string | null): JsonLd {
+  const { published, modified } = postDates(post);
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
     description,
     ...(imageUrl ? { image: imageUrl } : {}),
-    // No dateModified: the Post type carries only publishedAt, and claiming a
-    // modification date we don't have would be a fabricated signal.
-    datePublished: post.publishedAt ?? undefined,
+    // First publication and last change, not Strapi's publishedAt, which moves
+    // on every republish. Both are also printed on the page, which Google
+    // requires for the structured dates to be trusted.
+    datePublished: published ?? undefined,
+    dateModified: modified ?? undefined,
     author: { "@id": ORGANISATION_ID },
     publisher: { "@id": ORGANISATION_ID },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${SITE_URL}/blog/${post.slug}`,
+      // The post's own URL. This was hardcoded to /blog/<slug>, which for a
+      // UAE or Saudi article named a URL that only redirects to the real one.
+      "@id": `${SITE_URL}${postPath(post)}`,
     },
     inLanguage: "en",
   };

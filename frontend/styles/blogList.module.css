@@ -61,6 +61,14 @@
   font-weight: 400;
 }
 
+/* "Last updated …" under the article title: the date pill's size and white,
+   slightly muted so the title stays the focus. */
+.updated {
+  margin-top: 1.0582010582010581vw;
+  font-size: 1.0582010582010581vw;
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .socialContainer {
   display: flex;
   align-items: center;
@@ -232,6 +240,11 @@
   .titleContainer {
     font-size: 5.333333333333334vw;
     width: 87.2vw;
+  }
+
+  .updated {
+    margin-top: 3.2vw;
+    font-size: 3.2vw;
   }
 
   .socialContainer {

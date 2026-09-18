@@ -22,6 +22,7 @@ import PageShell from "../PageShell";
 import BlogContentBlock, { type ContentBlock } from "../BlogContentBlock";
 import BlogTeaser from "../BlogTeaser";
 import ContactCta from "../ContactCta";
+import { formatPostDate, postDates } from "@/lib/post-dates";
 
 /**
  * How many posts the "You may also like" sidebar shows.
@@ -84,8 +85,9 @@ export default async function BlogPostPage({
   const cover = mediaUrl(post.cover);
   const base = region.segment ? `/${region.segment}` : "";
   const blocks = (post.contentBlocks ?? []) as ContentBlock[];
-  const date = post.publishedAt
-    ? new Date(post.publishedAt).toLocaleDateString("en-US")
+  const dates = postDates(post);
+  const date = dates.published
+    ? new Date(dates.published).toLocaleDateString("en-US")
     : null;
 
   // Same description the <meta> tag uses, so the two can't disagree — search
@@ -116,6 +118,15 @@ export default async function BlogPostPage({
             </div>
 
             <h1 className={styles.titleContainer}>{post.title}</h1>
+
+            {/* The visible counterpart of dateModified in the article schema:
+                Google disregards structured dates that the page doesn't show. */}
+            {dates.modified && (
+              <p className={styles.updated}>
+                Last updated{" "}
+                <time dateTime={dates.modified}>{formatPostDate(dates.modified)}</time>
+              </p>
+            )}
 
             <div className={styles.socialContainer}>
               <span className={styles.share}>Follow us on:</span>

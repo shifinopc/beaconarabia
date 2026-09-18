@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "@/styles/personalBlog.module.css";
 import { mediaUrl, postPath, type Post } from "@/lib/strapi";
+import { postDates } from "@/lib/post-dates";
 
 /**
  * The blog card grid, shared by the homepage teaser and the blog index.
@@ -21,9 +22,9 @@ export default function BlogCards({
     <div className={styles.companyBlogCards}>
       {posts.map((post, index) => {
         const cover = mediaUrl(post.cover);
-        const date = post.publishedAt
-          ? new Date(post.publishedAt).toLocaleDateString("en-US")
-          : null;
+        // Same first-publish date as the article page and its schema.
+        const published = postDates(post).published;
+        const date = published ? new Date(published).toLocaleDateString("en-US") : null;
         const cardClass =
           featureEveryFifth && index % 5 === 0
             ? styles.companyBlogCard2

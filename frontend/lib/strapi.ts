@@ -92,7 +92,10 @@ export interface Post {
   excerpt?: string;
   body?: string;
   region: RegionKey;
+  /** Reset by Strapi on every republish — not a first-publish date. See lib/post-dates.ts. */
   publishedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
   cover?: StrapiImage | null;
   /** Migrated article body: an ordered list of heading/text/list/image blocks. */
   contentBlocks?: unknown[] | null;
