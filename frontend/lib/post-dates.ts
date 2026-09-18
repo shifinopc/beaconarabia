@@ -17,7 +17,7 @@ import type { Post } from "./strapi";
  */
 const LEGACY_FIRST_PUBLISHED: Record<string, string> = {
   // `publishedAt` from Sanity project l1v9kmrc, the date the old sites showed
-  // on each article. Read on 21 Sep 2026.
+  // on each article. Read on 18 Sep 2026.
   "business-incorporation": "2024-04-10",
   "premium-residency-in-ksa": "2024-10-20",
   "freezone-vs-mainland": "2024-11-01",
