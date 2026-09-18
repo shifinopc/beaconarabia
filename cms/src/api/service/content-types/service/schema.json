@@ -49,6 +49,11 @@
     },
     "details": {
       "type": "json"
+    },
+    "seoTitle": {
+      "type": "string",
+      "maxLength": 60,
+      "description": "Optional <title> for this service page, replacing the default (the service title, plus \" in <country>\" on regional pages). \" | Beacon\" is appended automatically, so do not type it. Leave empty to keep the default."
     }
   }
 }

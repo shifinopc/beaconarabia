@@ -67,6 +67,11 @@ export interface Service {
   order?: number;
   /** Sub-services listed in the services-page hover overlay. */
   details?: string[] | null;
+  /**
+   * Editor-set <title>, max 60 characters in the CMS. Replaces the whole
+   * default title; the root layout's template still appends " | Beacon".
+   */
+  seoTitle?: string | null;
 }
 
 export interface Page {

@@ -947,6 +947,10 @@ export interface ApiServiceService extends Struct.CollectionTypeSchema {
     region: Schema.Attribute.Enumeration<['global', 'ae', 'sa']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'global'>;
+    seoTitle: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
     slug: Schema.Attribute.String & Schema.Attribute.Required;
     summary: Schema.Attribute.Text;
     title: Schema.Attribute.String & Schema.Attribute.Required;

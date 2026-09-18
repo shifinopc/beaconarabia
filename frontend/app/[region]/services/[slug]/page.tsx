@@ -48,16 +48,19 @@ export async function generateMetadata({
   const description =
     service.summary?.trim() ||
     `${service.title} in ${region.label}. Talk to Beacon about scope, timelines and cost.`;
+  // seoTitle replaces the whole default, country suffix included: an editor
+  // writing one for a regional page is naming the market themselves.
+  const title = service.seoTitle?.trim() || `${service.title} in ${region.label}`;
 
   return {
-    title: `${service.title} in ${region.label}`,
+    title,
     description: description.slice(0, 155),
     alternates: {
       ...alternatesFor(region, `services/${slug}`),
       canonical: `${regionUrl(region)}/services/${slug}`,
     },
     openGraph: {
-      title: `${service.title} in ${region.label}`,
+      title,
       description: description.slice(0, 200),
       url: `${regionUrl(region)}/services/${slug}`,
       type: "article",

@@ -39,16 +39,18 @@ export async function generateMetadata({
   const description =
     service.summary?.trim() ||
     `${service.title}. Talk to Beacon about scope, timelines and cost.`;
+  // An empty or whitespace-only seoTitle means "not set", not a blank title.
+  const title = service.seoTitle?.trim() || service.title;
 
   return {
-    title: service.title,
+    title,
     description: description.slice(0, 155),
     alternates: {
       ...alternatesFor(REGIONS.global, `services/${slug}`),
       canonical: `${regionUrl(REGIONS.global)}/services/${slug}`,
     },
     openGraph: {
-      title: service.title,
+      title,
       description: description.slice(0, 200),
       url: `${regionUrl(REGIONS.global)}/services/${slug}`,
       type: "article",
