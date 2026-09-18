@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { Region } from "@/lib/regions";
 import TurnstileWidget from "./TurnstileWidget";
 import { submitForm, HONEYPOT_FIELD, honeypotStyle } from "@/lib/submit-form";
+import { trackEvent } from "@/lib/analytics-events";
 
 const EMPTY = { name: "", phone: "", email: "", companyname: "" };
 
@@ -117,6 +118,12 @@ export default function Popup({
       link.href = "/ebook/ebook.pdf";
       link.download = "beacon-business-setup-guide.pdf";
       link.click();
+      // A script-triggered download is invisible to GA4's automatic file_download tracking.
+      trackEvent("file_download", {
+        file_name: "beacon-business-setup-guide.pdf",
+        file_extension: "pdf",
+        link_url: "/ebook/ebook.pdf",
+      });
     }
 
     close();
