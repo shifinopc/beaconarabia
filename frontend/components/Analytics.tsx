@@ -27,6 +27,14 @@ import Script from "next/script";
  * can be counted twice, so this component is to be deleted — along with its
  * <Analytics /> line in app/layout.tsx — as soon as GA4 Realtime and GTM
  * Preview confirm the container is reporting. Days, not weeks.
+ *
+ * DO NOT REMOVE YET (18 Sep 2026): GTM-KZ8GPMCB has never been published —
+ * googletagmanager.com/gtm.js?id=GTM-KZ8GPMCB returns 404 — so this tag is
+ * the only thing sending data to GA4. Deleting it now would stop analytics
+ * entirely. Publish the container (with a GA4 tag for G-DWYWTG8VYD), confirm
+ * it in Realtime, and only then remove this component. The conversion events
+ * in lib/analytics-events.ts go through window.gtag/dataLayer and keep
+ * working either way.
  */
 
 const MEASUREMENT_ID =

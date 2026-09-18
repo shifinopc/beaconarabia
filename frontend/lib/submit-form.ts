@@ -7,6 +7,8 @@
  * exactly the kind of thing that drifts when it is written out three times.
  */
 
+import { trackSubmission } from "./analytics-events";
+
 /**
  * The honeypot field's name. Attractive to a bot filling every input it finds,
  * and never filled by a real user because the field is hidden.
@@ -51,7 +53,15 @@ export async function submitForm(payload: SubmitPayload): Promise<SubmitResult> 
       body: JSON.stringify({ sourcePath: currentPath(), ...payload }),
     });
 
-    if (res.ok) return { ok: true };
+    if (res.ok) {
+      // The one place every form passes through on success, so all three are counted the same way.
+      trackSubmission(payload.kind, {
+        region: payload.region,
+        enquiryType: payload.enquiryType,
+        subject: payload.subject,
+      });
+      return { ok: true };
+    }
 
     const data = (await res.json().catch(() => null)) as { error?: string } | null;
     return {

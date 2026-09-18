@@ -10,6 +10,7 @@ import GoogleTagManager, {
   GoogleTagManagerNoScript,
 } from "@/components/GoogleTagManager";
 import Clarity from "@/components/Clarity";
+import ContactClickTracking from "@/components/ContactClickTracking";
 
 // Runs once at module load, i.e. when the server boots — so a production
 // deployment missing STRAPI_URL or NEXT_PUBLIC_SITE_URL fails immediately and
@@ -105,6 +106,7 @@ export default async function RootLayout({
         <GoogleTagManager />
         <Analytics />
         <Clarity />
+        <ContactClickTracking />
         {children}
       </body>
     </html>
