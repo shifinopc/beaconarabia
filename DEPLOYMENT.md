@@ -398,6 +398,7 @@ assigned you (`loc=`), which is what the proxy will actually see.
 | Production CMS falls over during a build | Built against it. Use `STRAPI_INTERNAL_URL` pointed at a local CMS |
 | CMS `dist` archive is ~96 KB not ~14 MB | Packaged while `strapi develop` was running; it wipes `dist/build` |
 | `unzip` warns about backslashes; files named `dist\build\…` | Archive made with PowerShell `Compress-Archive` — use `tar` (rule 4) |
+| `/ae`, `/sa` and their section pages 404 after a CMS publish, `NoFallbackError` in the log; detail pages fine | A route with `dynamicParams = false` cannot regenerate after `/api/revalidate`. Every `[region]` route must use `true` and call `notFound()` itself. A restart clears it until the next publish |
 
 Several of these are dangerous specifically because the site *looks* merely
 stale rather than broken: the execute-bit problem, the incomplete build, and
