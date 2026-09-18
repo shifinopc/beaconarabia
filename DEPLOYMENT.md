@@ -317,8 +317,11 @@ curl -s https://beaconarabia.com/ | grep -o '/_next/image' | wc -l   # must be 0
 Both `/blog/[slug]` and `/[region]/blog/[slug]` declare `generateStaticParams`,
 so every article that exists at build time ships as static HTML. They also set
 `dynamicParams = true` (since 8 Sep 2026): an article published in the CMS
-after the last build is rendered on its first request, then cached and
-revalidated like the rest. Before that change such an article returned 404
+after the last build is rendered on its first request, then cached like the
+rest. The refresh interval is set on the CMS fetches, not the routes: every
+Strapi request in `lib/strapi.ts` uses `next: { revalidate: 60 }`, so an edit
+to a published article shows within about a minute, or immediately when the
+Strapi webhook calls `/api/revalidate`. Before that change such an article returned 404
 until the next deploy. The same applies to service and office pages. An
 unknown slug still returns 404 — the page calls `notFound()` when the CMS has
 no such entry.
