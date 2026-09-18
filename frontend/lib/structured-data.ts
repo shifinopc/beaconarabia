@@ -32,13 +32,34 @@ export interface JsonLd {
  * LocalBusiness, which is the right shape for a consultancy with physical
  * offices and lets the address and contact details be understood as such.
  */
+/**
+ * Beacon's Google Business Profile (Dubai office), as its Knowledge Graph entity.
+ *
+ * The CMS stores the profile's share link (g.co/kgs/HQrx35n), which resolves to
+ * kgmid /g/11wg8kg22x, "Beacon Management Consultants". Share links are
+ * shortener redirects with no promise of permanence; the kgmid URL names the
+ * entity itself, which is what sameAs is for.
+ */
+const DUBAI_BUSINESS_PROFILE = "https://www.google.com/search?kgmid=/g/11wg8kg22x";
+
+/** Links that open a chat rather than describe the company: not profiles. */
+const NOT_A_PROFILE = /^https?:\/\/(wa\.me|api\.whatsapp\.com|web\.whatsapp\.com)\//i;
+
 export function organisationSchema(site: SiteInfo): JsonLd {
   return {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
     "@id": ORGANISATION_ID,
     name: site.copyrightHolder,
-    alternateName: "Beacon",
+    /**
+     * Identity, stated precisely. Answer engines have been merging this firm
+     * with Beacon UAE (beaconuae.com, an unrelated Dubai setup agency) and
+     * Beacon Management & Consulting, LLC (a Florida HOA manager). A bare
+     * "Beacon" alias invited that; the registered name and the two names the
+     * firm actually trades under do not.
+     */
+    legalName: "Beacon Management Consultants CO.LTD",
+    alternateName: ["Beacon Management Consultants", "Beacon Arabia"],
     url: SITE_URL,
     logo: `${SITE_URL}/icon.svg`,
     image: `${SITE_URL}/icon.svg`,
@@ -50,9 +71,16 @@ export function organisationSchema(site: SiteInfo): JsonLd {
       addressCountry: "SA",
     },
     hasMap: site.office.mapUrl,
-    // Only the profiles the CMS actually lists — an unreachable sameAs link is
-    // worse than none, since it weakens the entity match.
-    sameAs: site.social.map((s) => s.href).filter((href) => /^https?:\/\//.test(href)),
+    // The profiles the CMS lists — an unreachable sameAs link is worse than
+    // none, since it weakens the entity match — minus the WhatsApp chat link,
+    // which is a way to reach the firm, not a page about it. Plus the Business
+    // Profile, the strongest single signal of which "Beacon" this is.
+    sameAs: [
+      ...site.social
+        .map((s) => s.href)
+        .filter((href) => /^https?:\/\//.test(href) && !NOT_A_PROFILE.test(href)),
+      DUBAI_BUSINESS_PROFILE,
+    ],
     areaServed: [
       { "@type": "Country", name: "Saudi Arabia" },
       { "@type": "Country", name: "United Arab Emirates" },
