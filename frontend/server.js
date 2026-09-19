@@ -57,8 +57,41 @@ const port = parseInt(process.env.PORT || "3000", 10);
 const app = next({ dev: false });
 const handle = app.getRequestHandler();
 
+/**
+ * Last-resort guard around Next's request handler.
+ *
+ * With this bare createServer setup (rather than `next start`), an error that
+ * Next throws out of `handle` is not turned into a response: it escapes as an
+ * unhandled rejection with a full stack trace in stderr.log, and the client is
+ * left waiting. Bot traffic made that routine — `NoFallbackError` from routes
+ * with `dynamicParams = false` filled stderr.log to 1.8 MB before those routes
+ * were switched to `true` on 18 Sep 2026.
+ *
+ * Any such error now gets one log line and a plain 500, so the next surprise is
+ * visible without burying the log. Normal 404s never reach this: Next renders
+ * those itself.
+ */
+async function handleSafely(req, res) {
+  try {
+    await handle(req, res);
+  } catch (err) {
+    const message = err && err.message ? err.message : String(err);
+    // Once headers are out the status can't change; say so rather than
+    // logging a 500 the client never received.
+    const outcome = res.headersSent ? "response cut short" : "500";
+    console.error(`[server] ${req.method} ${req.url} -> ${outcome}: ${message}`);
+    if (!res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.end("Internal Server Error");
+    } else {
+      res.end();
+    }
+  }
+}
+
 app.prepare().then(() => {
-  createServer((req, res) => handle(req, res)).listen(port, () => {
+  createServer(handleSafely).listen(port, () => {
     console.log(`> Ready on port ${port}`);
   });
 });
