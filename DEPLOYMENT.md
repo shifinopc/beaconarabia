@@ -22,9 +22,26 @@ bash ~/scripts/nproc-census.sh
 
 Expect exactly one `frontend` and one `cms.beaconarabia.com` Node process, and a
 thread total well under 100. The script is fork-free, so it still runs when the
-account is at its limit and `ps` cannot. Passenger on this
-host regularly fails to reap the previous instance on restart, leaving two
-running — one 22 hours old alongside a fresh one, in the worst case observed.
+account is at its limit and `ps` cannot.
+
+Two frontend processes have two causes on this host:
+
+- **LiteSpeed starts a second instance by itself under load.** On 18 and
+  19 Sep 2026 a second `lsnode (frontend)` appeared minutes after a clean
+  start, with the *same parent* as the first and no restart in between —
+  typically after a burst of parallel requests (scripted checks, a site-wide
+  revalidate). Each costs ~39 threads, so two frontends plus the CMS sits at
+  ~88/100.
+- **Stop App does not always end it.** Both times, Stop App ended one frontend
+  and left the second running, still on the old code. Starting the app then
+  gives two instances on two different builds.
+
+So check **between Stop App and Start App**, not only after: the census must
+show zero `(frontend)` processes before you start. A survivor is ended with
+`kill <pid>` from cPanel → Terminal (a plain `kill` has been enough; use
+`kill -9` only if it is still listed a few seconds later). Verpex has been asked
+whether LiteSpeed can be capped at one instance per app; until they confirm,
+this check is the workaround.
 
 This is the single most common failure here, and its symptoms are misleading:
 
@@ -168,7 +185,22 @@ find .next -type d ! -perm -u+x | wc -l   # must print 0
 ls .next/prerender-manifest.json          # must exist before starting
 ```
 
-Then **Start App** in cPanel.
+Before **Start App**, confirm nothing survived the stop (rule 0):
+
+```bash
+bash ~/scripts/nproc-census.sh | grep -c '(frontend)'   # must print 0
+```
+
+If it prints 1 or more, `kill` that PID first. Then **Start App** in cPanel.
+
+**`server.js` is not in the archive.** The `.next` package carries the build
+only; `frontend/server.js` (the entry point cPanel runs) is deployed on its own.
+When it changes, upload it to `~/frontend/`, check it with the app's own Node,
+then Stop App → census → Start App — no `.next` swap needed:
+
+```bash
+source ~/nodevenv/frontend/24/bin/activate && node --check ~/frontend/server.js && echo OK; deactivate
+```
 
 **Never `touch tmp/restart.txt`.** It asks for a graceful restart, which starts
 the new Node process while the old one is still alive, and on this host the old
@@ -287,6 +319,33 @@ Non-obvious ones:
 EmailJS is gone. Mail is sent by the CMS over SMTP (nodemailer), configured in
 the admin's **Email Settings** single type rather than by environment variable,
 so a changed mailbox is a CMS edit rather than a deploy.
+
+---
+
+## Logs
+
+The frontend's output goes to `~/frontend/stderr.log` (the CMS's to
+`~/cms.beaconarabia.com/stderr.log`).
+
+- **`[server] <METHOD> <url> -> 500: <message>`** — an error Next threw out of
+  its request handler, caught by `server.js` (since 19 Sep 2026) and answered
+  with a plain 500. `-> response cut short` means the page had already started
+  sending, so the status could not change. Any such line is worth
+  investigating; before this guard these were full stack traces with no
+  response sent.
+- **A fetch error naming `status: 530` and an endpoint** — the frontend could
+  not reach the CMS through Cloudflare, usually because the CMS app was down or
+  restarting at that moment.
+
+To clear the log, **truncate it — do not delete it**. The running app keeps its
+file handle, so a deleted log is never recreated until the next restart:
+
+```bash
+: > ~/frontend/stderr.log
+```
+
+It was last cleared on 19 Sep 2026, from 1.9 MB, almost all of it
+`NoFallbackError` stack traces from before the `dynamicParams` fix below.
 
 ---
 
@@ -428,7 +487,8 @@ Both apps at once is what has caused the most trouble. One at a time:
 1. Check headroom: cPanel → Resource Usage → Current usage. NPROC should be
    well under 100 before you start. If it is not, stop both apps, run
    `scripts/nproc-census.sh` to see what is holding it, and clear it first.
-2. Deploy the **frontend** (Stop App, extract, `chmod`, Start App), verify.
+2. Deploy the **frontend** (Stop App, census shows no frontend, extract,
+   `chmod`, Start App), verify. If `server.js` changed, upload it too.
 3. Deploy the **CMS**, with the frontend app **stopped** if `npm install` is
    needed. Start the frontend again afterwards.
 4. Re-check for duplicates — both apps just restarted.
