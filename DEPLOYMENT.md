@@ -232,6 +232,22 @@ is the correct shape.
 midway leaves `BUILD_ID` behind and every request 503s or 500s while LiteSpeed
 serves a default page that looks like a stale site rather than an error.
 
+**Verify through the public hostname, not `127.0.0.1:3000`.** LiteSpeed hands
+lsnode a socket rather than a fixed port, so nothing on the account ever listens
+on 3000 and every such `curl` returns `000` — which reads like a dead app when
+the site is in fact serving. `curl https://beaconarabia.com/...` from the server
+shell is fine; it goes out through Cloudflare and back.
+
+**No `/api/revalidate` is needed after a `.next` swap.** The extracted build is
+fresh, so there is no stale ISR cache to flush — the restart alone is the whole
+job. Revalidate is for CMS edits against an already-running build (the Strapi
+webhook fires it), not for deploys. It also cannot be fired from the server
+shell the obvious way: **there is no `.env.local` on the server.** Production
+environment variables live in the cPanel Node.js app config (Setup Node.js App →
+beaconarabia.com → the variables list), so `REVALIDATE_SECRET` is not in any
+file to `grep`. Reading it from the app config is the only way, and it belongs
+in the browser, not in a shell command that lands in `.bash_history`.
+
 ## Deploying a CMS change
 
 Locally — **stop `strapi develop` first**. It wipes `dist/build` on every
