@@ -176,9 +176,8 @@ export default async function BlogPostPage({
                       unoptimized
                     />
                   )}
-                  <div className={styles.allBlogsContainerTitle}>
-                    {other.subtitle || other.title}
-                  </div>
+                  {/* Title only — see BlogCards.tsx. */}
+                  <div className={styles.allBlogsContainerTitle}>{other.title}</div>
                 </div>
               </Link>
             );

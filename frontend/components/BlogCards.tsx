@@ -70,7 +70,14 @@ export default function BlogCards({
               </div>
 
               <div className={styles.companyBlogContent}>
-                <h3 className={styles.text5}>{post.subtitle || post.title}</h3>
+                {/* The post's own title, not its subtitle. Newer posts use
+                    subtitle as a descriptive deck, so `subtitle || title` put
+                    "A Practical Buyer's Guide To Scope…" on a card linking to
+                    "SEO Services in Dubai: What an SEO Engagement Should
+                    Include". The card is an internal link, so its text is the
+                    anchor Google reads for the page it points at: it has to be
+                    that page's title. */}
+                <h3 className={styles.text5}>{post.title}</h3>
                 <div className={styles.readmore}>
                   <span>Read More</span>
                   <Image

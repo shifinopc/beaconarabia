@@ -19,6 +19,17 @@ export default function ContactCta({
   const base = region.segment ? `/${region.segment}` : "";
   const title = section?.title ?? "Have Queries? We Provide Solutions.";
   const ctaLabel = section?.ctaLabel ?? "Let’s Talk";
+  /**
+   * The CMS description, when the section has one.
+   *
+   * Both paragraphs below are the same sentence at two breakpoints, and both
+   * were hardcoded — so the Saudi `contact-cta` copy an editor wrote never
+   * appeared anywhere. The fallback keeps every page that has no description
+   * exactly as it was.
+   */
+  const description =
+    section?.description?.trim() ||
+    "If you're seeking tailored solutions, look no further. Get in touch with us today for expert business consultancy services across the GCC.";
 
   return (
     <div className="contactMainContainer">
@@ -27,14 +38,9 @@ export default function ContactCta({
           <h2 className="contactHeading">{title}</h2>
         </div>
         <div className="contactDescContainer">
-          <p className="contactDesc">
-            If you&apos;re seeking tailored solutions, look no further. Get in touch with{" "}
-            <br /> us today for expert business consultancy services across the GCC.
-          </p>
-          <p className="mContactDesc">
-            If you&apos;re seeking tailored solutions, look no further. Get in touch with us
-            today for expert business consultancy services across the GCC.
-          </p>
+          {/* Desktop and mobile variants of one paragraph; CSS shows one. */}
+          <p className="contactDesc">{description}</p>
+          <p className="mContactDesc">{description}</p>
         </div>
         <div>
           {/* Plain apostrophe: this is a string prop, not JSX text, so an

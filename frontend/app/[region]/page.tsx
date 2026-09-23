@@ -57,10 +57,21 @@ export async function generateMetadata({
       description:
         "Set up a business in the UAE with Beacon. Mainland, free zone and offshore incorporation, licensing, accounting, audit and tax, from our Dubai office.",
     },
+    /*
+     * Saudi targets "business setup consultants in saudi arabia" (23 Sep 2026).
+     * That phrase and its variants drew 414 impressions in 90 days at position
+     * 25, 339 of them to the retiring ksa.beaconarabia.com; Google otherwise
+     * prefers the global homepage for it, in the thirties. The page's H1 and
+     * body were rewritten for it the same day — this is the title tag.
+     * UAE is deliberately untouched: no equivalent keyword work yet.
+     */
     sa: {
-      title: "Business Setup & Company Formation in Saudi Arabia",
+      title: "Business Setup Consultants in Saudi Arabia",
       description:
-        "Enter the Saudi market with Beacon. MISA registration, company formation, licensing, accounting, audit and tax, from offices in Riyadh, Jeddah and Dammam.",
+        // 154 characters: the brief's wording ran to 168, past the 155 this
+        // codebase truncates descriptions at. "PRO services" gave way to the
+        // three cities, which the H1 and body already lean on.
+        "Beacon sets up companies in Saudi Arabia: MISA licensing, commercial registration, ZATCA and GOSI, then accounting, audit and tax. Riyadh, Jeddah, Dammam.",
     },
   };
 
